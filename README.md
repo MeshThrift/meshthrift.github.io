@@ -1,7 +1,8 @@
 # MeshThrift
+
 ## Brand Identity System
 
-> *Geometry-Native Infrastructure for the Spatial Internet*
+> _Geometry-Native Infrastructure for the Spatial Internet_
 
 ---
 
@@ -70,13 +71,13 @@ MeshThrift is **not**:
 
 ## Competitive Positioning
 
-| Company | Their Layer | MeshThrift Equivalent |
-|---|---|---|
-| Cloudflare | Network security & performance | Geometry security & performance |
-| Fastly | Edge delivery & compute | Edge mesh delivery & geometry compute |
-| Vercel | Frontend deployment | WebGPU application deployment |
-| Akamai | Content delivery at scale | 3D content delivery at scale |
-| AWS CloudFront | Generic static delivery | Render-aware dynamic delivery |
+| Company        | Their Layer                    | MeshThrift Equivalent                 |
+| -------------- | ------------------------------ | ------------------------------------- |
+| Cloudflare     | Network security & performance | Geometry security & performance       |
+| Fastly         | Edge delivery & compute        | Edge mesh delivery & geometry compute |
+| Vercel         | Frontend deployment            | WebGPU application deployment         |
+| Akamai         | Content delivery at scale      | 3D content delivery at scale          |
+| AWS CloudFront | Generic static delivery        | Render-aware dynamic delivery         |
 
 MeshThrift's moat is not infrastructure scale. It is **geometry intelligence** — the ability to understand, prioritize, transform, and deliver 3D content in ways no general-purpose CDN can.
 
@@ -143,13 +144,13 @@ MeshThrift is **not** a consumer brand. It does not simplify for the sake of acc
 
 ## Do / Don't
 
-| Do | Don't |
-|---|---|
-| "Render-aware delivery for real-time 3D." | "A powerful CDN solution for your 3D needs." |
-| "Progressive mesh streaming at the edge." | "Seamlessly stream your 3D assets with ease." |
-| "Geometry-aware caching and chunk prioritization." | "Smart caching that just works." |
-| "GPU upload scheduling reduces VRAM pressure." | "Optimized for better performance." |
-| "The infrastructure layer for spatial computing." | "The future of 3D on the web!" |
+| Do                                                               | Don't                                          |
+| ---------------------------------------------------------------- | ---------------------------------------------- |
+| "Render-aware delivery for real-time 3D."                        | "A powerful CDN solution for your 3D needs."   |
+| "Progressive mesh streaming at the edge."                        | "Seamlessly stream your 3D assets with ease."  |
+| "Geometry-aware caching and chunk prioritization."               | "Smart caching that just works."               |
+| "GPU upload scheduling reduces VRAM pressure."                   | "Optimized for better performance."            |
+| "The infrastructure layer for spatial computing."                | "The future of 3D on the web!"                 |
 | "MeshThrift transforms how geometry moves through the internet." | "MeshThrift is revolutionizing the CDN space." |
 
 ## Approved Vocabulary
@@ -166,18 +167,23 @@ MeshThrift is **not** a consumer brand. It does not simplify for the sake of acc
 ## Writing Samples by Context
 
 **Homepage hero tagline:**
+
 > Geometry-Native Infrastructure for the Spatial Internet
 
 **Feature description:**
+
 > MeshThrift's runtime streaming engine coordinates progressive mesh loading, async decode pipelines, and GPU upload scheduling inside the browser — treating the client renderer as an active participant in infrastructure optimization, not a passive endpoint.
 
 **Error message:**
+
 > Stream interrupted. Geometry chunk `mesh_0x4f2a` failed to decode. Retrying with LOD fallback.
 
 **API documentation intro:**
+
 > The MeshThrift SDK provides a streaming client for progressive 3D scene delivery. It manages chunk orchestration, LOD selection, and GPU upload scheduling automatically, exposing event hooks for custom render integration.
 
 **Marketing one-liner:**
+
 > Traditional CDNs move bytes. MeshThrift moves geometry.
 
 ---
@@ -203,6 +209,7 @@ The MeshThrift mark is a **tessellated diamond** — a polygon vertex seen from 
 The diamond form is constructed from four triangular faces meeting at a central pivot node — the fundamental unit of polygon mesh topology. The internal cross lines represent the subdivision structure of an adaptive LOD system. The vertex nodes (●) at each corner represent edge nodes in a distributed delivery network.
 
 The mark is simultaneously:
+
 - A **polygon mesh vertex** (the geometry product)
 - An **edge network node** (the infrastructure product)
 - A **diamond precision form** (the engineering quality)
@@ -227,6 +234,7 @@ The mark and wordmark are always horizontally aligned at the optical center of t
 ## Icon-Only Usage
 
 The mark may be used alone (without wordmark) only in:
+
 - Favicons and app icons
 - Embossed/watermark contexts
 - Social media profile images
@@ -234,12 +242,12 @@ The mark may be used alone (without wordmark) only in:
 
 ## Minimum Sizes
 
-| Context | Minimum Size |
-|---|---|
-| Print | 16mm / 45pt |
-| Digital (full lockup) | 120px wide |
-| Digital (icon only) | 24px wide |
-| Favicon | 16px × 16px |
+| Context               | Minimum Size |
+| --------------------- | ------------ |
+| Print                 | 16mm / 45pt  |
+| Digital (full lockup) | 120px wide   |
+| Digital (icon only)   | 24px wide    |
+| Favicon               | 16px × 16px  |
 
 ## Clear Space
 
@@ -300,43 +308,52 @@ Border Bright rgba(0,216,255,0.25)   Emphasized border / hover
 ## Color Definitions
 
 ### Deep Space · `#030B18`
+
 **Role:** Primary background — pages, hero sections, full-bleed areas.
 **Usage:** The foundational color. Never pure black. Always carries a blue undertone that places it within the render environment color temperature. This is the darkness inside a WebGL canvas before geometry appears.
 **Pairs with:** Geometry Cyan, Electric Blue, Render White.
 
 ### Midnight · `#0A1628`
+
 **Role:** Secondary background — cards, panels, sidebar surfaces, elevated surfaces.
 **Usage:** Used for UI surfaces that sit above the primary background. Provides depth hierarchy without requiring shadows. Think of it as the second render layer — geometry slightly closer to the viewer.
 **Pairs with:** Border Cyan, Text Blue, Geometry Cyan.
 
 ### Geometry Cyan · `#00D8FF`
+
 **Role:** Primary brand color — mark, active states, primary CTAs, key data, wireframe visualizations.
 **Usage:** The most visible and dominant chromatic color in the system. Used with restraint — always meaningful, never decorative. This is the color of rendered light in a GPU pipeline. The color of a visible edge in a wireframe. Used at full opacity for interactive states, text labels, and data highlights. Used at reduced opacity (10–25%) for borders, backgrounds, and ambient surface decoration.
 **Never use on:** Warm or neutral backgrounds. Never alongside orange or red accent colors.
 
 ### Electric Blue · `#0A84FF`
+
 **Role:** Secondary accent — streaming indicators, secondary interactive states, link text, supporting data visualization.
 **Usage:** Subordinate to Geometry Cyan. Used for secondary information hierarchy — the second tier of the geometry streaming system. Where Cyan represents the primary delivery path, Blue represents supporting data flows.
 **Pairs with:** Geometry Cyan in multi-color data displays. Never in equal visual weight.
 
 ### Vertex Purple · `#8B5CF6`
+
 **Role:** Tertiary accent — AI-assisted features, edge compute indicators, premium or advanced states.
 **Usage:** Used sparingly. Maximum 10% of any given interface or composition. Signals depth of computation, neural processing, or AI-assisted optimization. The color of the algorithm behind the algorithm.
 **Do not use:** As a primary brand color. Do not use alongside the logo mark. Do not combine with Geometry Cyan and Electric Blue simultaneously unless in a data visualization context.
 
 ### Render White · `#E8F4FF`
+
 **Role:** Primary text — headings, prominent labels, UI text that must command maximum attention.
 **Usage:** Not pure white. The blue tint matches the ambient color temperature of a cool render environment. Pure white (`#FFFFFF`) is never used. The distinction is subtle but cumulative — it prevents the eye from experiencing harsh contrast shock against the dark backgrounds.
 
 ### Text Blue · `#C8DFF0`
+
 **Role:** Body text — paragraphs, descriptions, secondary content.
 **Usage:** Slightly more muted than Render White, maintaining the blue temperature. Long-form content lives here. Comfortable to read at 400 weight, 16–18px, with 1.6–1.7 line height.
 
 ### Mesh Gray · `#4A6A85`
+
 **Role:** Muted text — timestamps, metadata, labels, helper text, placeholder content.
 **Usage:** Always blue-gray. Never warm gray, never neutral gray. The same color temperature rules apply throughout. Active use in section labels, code comments, dimension annotations.
 
 ### Border Cyan · `rgba(0, 216, 255, 0.10)`
+
 **Role:** Default border — cards, inputs, dividers.
 **Usage:** The default boundary color for all UI components. At 10% opacity over dark backgrounds, it reads as a subtle, cool-toned edge. On hover or focus, transition to Border Bright (`rgba(0,216,255,0.25)`). Active/selected states use full Geometry Cyan.
 
@@ -383,6 +400,7 @@ MeshThrift uses three typefaces, each with a defined role. No substitutions. No 
 ---
 
 ### Orbitron — Display / Wordmark
+
 **Use for:** The MeshThrift wordmark, primary headline in marketing hero sections, section numbering in large display contexts.
 
 **Weights used:** 900 (Black) for wordmark and display, 700 (Bold) for secondary display, 400 (Regular) for spacious, technical labels.
@@ -394,6 +412,7 @@ MeshThrift uses three typefaces, each with a defined role. No substitutions. No 
 **Character:** Technical, geometric, spacefaring. The font of infrastructure companies with ambition. Uncompromising in its precision.
 
 **Sample:**
+
 ```
 MESHTHRIFT                   [900 / +0.08em]
 GEOMETRY · EDGE · STREAM     [700 / +0.15em]
@@ -403,6 +422,7 @@ VERSION 1.0.0                [400 / +0.20em]
 ---
 
 ### Syne — Headings / Editorial
+
 **Use for:** Section headings, product feature titles, marketing body headings, pull quotes, and editorial content.
 
 **Weights used:** 800 (ExtraBold) for primary headings, 700 (Bold) for secondary headings, 600 (SemiBold) for component titles and labels, 400 (Regular) for editorial subheadings.
@@ -414,6 +434,7 @@ VERSION 1.0.0                [400 / +0.20em]
 **Character:** Editorial, modern, geometric without being cold. Syne has personality that makes long-form content readable while maintaining the technical intelligence of the brand.
 
 **Type Scale:**
+
 ```
 H1 — 56px / 800 / -0.01em / lh 1.05   [Hero heading]
 H2 — 40px / 800 / -0.01em / lh 1.1    [Section heading]
@@ -425,6 +446,7 @@ H5 — 16px / 600 / default   / lh 1.4   [Label heading]
 ---
 
 ### DM Sans — Body / Interface
+
 **Use for:** All body copy, UI labels, navigation, form elements, descriptions, captions, tooltips.
 
 **Weights used:** 500 (Medium) for UI labels and interface text, 400 (Regular) for body copy and descriptions, 300 (Light) for captions and de-emphasized content.
@@ -436,6 +458,7 @@ H5 — 16px / 600 / default   / lh 1.4   [Label heading]
 **Character:** Clean, neutral, humanist. Legible at small sizes. High x-height makes it comfortable for dense UI. The invisible workhorse — it should never call attention to itself.
 
 **Text Scale:**
+
 ```
 Body LG  — 18px / 400 / lh 1.7    [Long-form article content]
 Body MD  — 16px / 400 / lh 1.6    [Default UI body text]
@@ -447,6 +470,7 @@ Caption  — 12px / 300 / lh 1.35   [Timestamps, metadata, help text]
 ---
 
 ### JetBrains Mono — Code / Data / Technical Labels
+
 **Use for:** Code blocks, API examples, metric values, technical labels, section identifiers, hex codes, version numbers, error messages, terminal output.
 
 **Weights used:** 500 (Medium) for highlighted data and labels, 400 (Regular) for body code, 300 (Light) for comments and de-emphasized code.
@@ -456,6 +480,7 @@ Caption  — 12px / 300 / lh 1.35   [Timestamps, metadata, help text]
 **Character:** Legible, developer-native, considered. Not cold — JetBrains Mono has subtle warmth in its letterforms that prevents developer documentation from feeling hostile.
 
 **Usage examples:**
+
 ```
 SECTION LABEL      [11px / 500 / +0.25em / uppercase — Geometry Cyan]
 Metric Value       [16px / 500 — Render White]
@@ -486,45 +511,55 @@ v1.4.2             [11px / 400 — Mesh Gray]
 MeshThrift's visual language is drawn directly from the technical domain it serves — the materials, structures, and processes of 3D rendering and geometry delivery.
 
 ### Polygon Mesh Topology
+
 The foundational visual motif. Thin-stroked triangles forming larger geometric structures — wireframe icosahedra, tessellated planes, mesh lattices. Always rendered as outlines only. Never filled. Colors: Geometry Cyan primary, Electric Blue secondary.
 
 **Construction rules:**
+
 - Strokes at 1px or thinner
 - Vertices marked with small circles (2–4px radius) in solid Geometry Cyan
 - Interior subdivision lines at reduced opacity (30–50%)
 - No fills, no gradients within mesh shapes
 
 ### Vertex Networks
+
 Graph structures with nodes and edges — representing edge compute topology, streaming architecture, and data flow systems. Nodes at edge positions are small solid circles. Central or origin nodes use an empty circle with a solid center point.
 
 **Construction rules:**
+
 - Edge lines at 0.75px
 - Primary edges at full opacity, secondary edges at 40–60%
 - Dashed lines for virtual or predicted connections
 - Nodes: outer radius 4px, inner fill radius 1.5px for origin nodes
 
 ### Spatial Grid Systems
+
 Perspective grids establishing the spatial computing environment. Always converge to a single vanishing point. Horizontal grid lines and vertical radials. The vanishing point horizon carries a slightly heavier stroke weight.
 
 **Construction rules:**
+
 - Perspective lines at reducing opacity as they recede
 - Horizon line at 1–1.5px, perspective lines at 0.5px
 - Color: Geometry Cyan at 20–60% opacity
 - Never use orthographic (isometric) grids — always perspective
 
 ### Geometry Chunks
+
 Rectangular units representing streamable geometry packages — decreasing in size left to right (or bottom to top) to visualize the LOD refinement process from raw geometry to GPU-ready mesh.
 
 **Construction rules:**
+
 - Thin-stroked rectangles with rounded corners (2px radius)
 - Labels in JetBrains Mono, 8–10px: `LOD0`, `LOD1`, `LOD2`, `GPU`
 - Dashed connecting lines between chunks to show stream order
 - Color progression: Geometry Cyan → Electric Blue → Vertex Purple
 
 ### Edge Node Topology
+
 Globe or sphere surface with nodes at geographic positions, connected by arcs and spokes to a central origin point. Represents the global edge delivery network.
 
 **Construction rules:**
+
 - Globe outlined at 30% opacity
 - Node circles at 4px radius, solid Geometry Cyan
 - Connection arcs as straight lines (not curves) at 40–60% opacity
@@ -558,12 +593,14 @@ In UI, do not use spatial grids. In editorial/marketing, use sparingly — one s
 MeshThrift uses photography rarely. When photography appears, it must follow strict direction:
 
 **Acceptable:**
+
 - Close-up detail photography of physical infrastructure (server hardware, fiber optic cables, GPU die shots, circuit traces)
 - Long-exposure data center photography with motion blur
 - Abstract material photography (metal surfaces, optical glass, silicon wafers)
 - All photography converted to cool temperature monochrome or duotone in Deep Space + Geometry Cyan
 
 **Never acceptable:**
+
 - People using computers or devices
 - Generic office environments
 - 3D rendered scenes (use actual SVG/canvas renders)
@@ -623,6 +660,7 @@ MESHTHRIFT
 ```
 
 ### Naming Convention
+
 All modules follow the pattern `MeshThrift [Function]`. The word "MeshThrift" is always written as one word, capital M, capital T. Never `Mesh Thrift`, never `meshthrift`, never `MESHTHRIFT` in prose (only in display/wordmark contexts).
 
 ### Module Identities
@@ -631,31 +669,31 @@ All modules follow the pattern `MeshThrift [Function]`. The word "MeshThrift" is
 Role: Mesh transport, progressive streaming, runtime hydration, chunk orchestration.
 Icon motif: Horizontal flow lines with rectangular chunks at decreasing sizes.
 Primary accent: Geometry Cyan.
-Tagline: *Deliver geometry progressively.*
+Tagline: _Deliver geometry progressively._
 
 **MeshThrift Edge**
 Role: Geometry caching, edge replication, request routing, predictive distribution.
 Icon motif: Globe with node network, radiating connection lines.
 Primary accent: Electric Blue.
-Tagline: *Serve geometry from everywhere.*
+Tagline: _Serve geometry from everywhere._
 
 **MeshThrift Optimize**
 Role: Auto LOD generation, mesh simplification, compression, geometry deduplication.
 Icon motif: Two overlapping diamond shapes, one larger and more complex, one reduced/simplified.
 Primary accent: Vertex Purple.
-Tagline: *Transform geometry for the web.*
+Tagline: _Transform geometry for the web._
 
 **MeshThrift Runtime**
 Role: Streaming integration, GPU scheduling, scene management, visibility optimization.
 Icon motif: A stylized GPU chip layout with streaming lanes indicated.
 Primary accent: Geometry Cyan + Electric Blue (both, indicating integration).
-Tagline: *Render geometry intelligently.*
+Tagline: _Render geometry intelligently._
 
 **MeshThrift Analytics**
 Role: Time-to-first-render, geometry throughput, decode latency, GPU upload performance, memory pressure monitoring.
 Icon motif: Axis chart with a streaming curve — frame rate over time with geometry delivery events marked.
 Primary accent: Electric Blue.
-Tagline: *Understand geometry performance.*
+Tagline: _Understand geometry performance._
 
 ---
 
@@ -719,30 +757,30 @@ Primary CTA: DM Sans Medium, Midnight background, Geometry Cyan border (1px), Ge
 
 ## Visual Don'ts
 
-| Avoid | Because |
-|---|---|
-| Pure black backgrounds (#000000) | Breaks color temperature system |
-| Pure white text (#FFFFFF) | Too harsh; renders incorrectly against brand backgrounds |
-| Warm gray or warm neutral colors | Breaks cool color temperature consistency |
-| Orange, yellow, or red as accent colors | Incompatible with the render environment palette |
-| Filled (non-wireframe) polygon shapes as decorative elements | Loses the wireframe identity |
-| Drop shadows on UI elements | Not appropriate for a dark-mode, render-environment aesthetic |
-| Rounded rectangles as primary shape motifs | Contradicts the geometric, angular visual language |
-| Any animation with spring physics or bounce | Feels consumer/playful, not infrastructure |
-| Gradient text fills | Gimmicky; reserves the gradient system for backgrounds only |
-| The Orbitron typeface at body sizes | Illegible and overused at small sizes |
+| Avoid                                                        | Because                                                       |
+| ------------------------------------------------------------ | ------------------------------------------------------------- |
+| Pure black backgrounds (#000000)                             | Breaks color temperature system                               |
+| Pure white text (#FFFFFF)                                    | Too harsh; renders incorrectly against brand backgrounds      |
+| Warm gray or warm neutral colors                             | Breaks cool color temperature consistency                     |
+| Orange, yellow, or red as accent colors                      | Incompatible with the render environment palette              |
+| Filled (non-wireframe) polygon shapes as decorative elements | Loses the wireframe identity                                  |
+| Drop shadows on UI elements                                  | Not appropriate for a dark-mode, render-environment aesthetic |
+| Rounded rectangles as primary shape motifs                   | Contradicts the geometric, angular visual language            |
+| Any animation with spring physics or bounce                  | Feels consumer/playful, not infrastructure                    |
+| Gradient text fills                                          | Gimmicky; reserves the gradient system for backgrounds only   |
+| The Orbitron typeface at body sizes                          | Illegible and overused at small sizes                         |
 
 ## Brand Don'ts
 
-| Avoid | Because |
-|---|---|
-| Describing MeshThrift as "a CDN" | Undersells. Always "geometry-aware CDN" or "mesh streaming infrastructure" |
-| Comparing to Dropbox, Google Drive, or file storage services | Wrong category entirely |
-| Using "3D" without qualification | Always qualify: "3D geometry delivery," "3D streaming," "3D scene" |
-| Showing generic cloud icons in diagrams | Aesthetically and conceptually wrong for this brand |
-| Using the word "solution" in any context | Generic, avoided by all high-quality infrastructure brands |
-| Showing the product as a "plugin" or "add-on" | MeshThrift is infrastructure, not a plugin |
-| Oversimplifying for a non-technical audience | The audience is builders. Respect their intelligence |
+| Avoid                                                        | Because                                                                    |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| Describing MeshThrift as "a CDN"                             | Undersells. Always "geometry-aware CDN" or "mesh streaming infrastructure" |
+| Comparing to Dropbox, Google Drive, or file storage services | Wrong category entirely                                                    |
+| Using "3D" without qualification                             | Always qualify: "3D geometry delivery," "3D streaming," "3D scene"         |
+| Showing generic cloud icons in diagrams                      | Aesthetically and conceptually wrong for this brand                        |
+| Using the word "solution" in any context                     | Generic, avoided by all high-quality infrastructure brands                 |
+| Showing the product as a "plugin" or "add-on"                | MeshThrift is infrastructure, not a plugin                                 |
+| Oversimplifying for a non-technical audience                 | The audience is builders. Respect their intelligence                       |
 
 ---
 
@@ -752,12 +790,12 @@ Primary CTA: DM Sans Medium, Midnight background, Geometry Cyan border (1px), Ge
 
 Brand decisions at different levels require different approval:
 
-| Level | Decision Type | Authority |
-|---|---|---|
-| Tier 1 | Color, font, logo usage | Brand / Design Lead |
-| Tier 2 | New product module naming | Brand + Product Lead |
-| Tier 3 | Brand voice / positioning evolution | Brand + Founders |
-| Tier 4 | Logo system modifications | Founders only |
+| Level  | Decision Type                       | Authority            |
+| ------ | ----------------------------------- | -------------------- |
+| Tier 1 | Color, font, logo usage             | Brand / Design Lead  |
+| Tier 2 | New product module naming           | Brand + Product Lead |
+| Tier 3 | Brand voice / positioning evolution | Brand + Founders     |
+| Tier 4 | Logo system modifications           | Founders only        |
 
 ## File Naming Convention
 
@@ -775,27 +813,27 @@ meshthrift_deck-template_v2.pptx
 
 ## Asset Formats
 
-| Asset | Format | Resolution |
-|---|---|---|
-| Logo (primary) | SVG | Vector |
-| Logo (raster use) | PNG | 1×, 2×, 3× |
-| Icon (favicon) | ICO / PNG | 16, 32, 64, 128px |
-| Social profile | PNG | 800 × 800px |
-| Deck template | PPTX + PDF | 1920 × 1080px |
-| Brand guidelines | PDF | Print-ready |
+| Asset             | Format     | Resolution        |
+| ----------------- | ---------- | ----------------- |
+| Logo (primary)    | SVG        | Vector            |
+| Logo (raster use) | PNG        | 1×, 2×, 3×        |
+| Icon (favicon)    | ICO / PNG  | 16, 32, 64, 128px |
+| Social profile    | PNG        | 800 × 800px       |
+| Deck template     | PPTX + PDF | 1920 × 1080px     |
+| Brand guidelines  | PDF        | Print-ready       |
 
 ---
 
 # 14 — Version History
 
-| Version | Date | Author | Notes |
-|---|---|---|---|
-| 1.0 | 2025-Q1 | Brand Team | Initial release |
+| Version | Date    | Author     | Notes           |
+| ------- | ------- | ---------- | --------------- |
+| 1.0     | 2025-Q1 | Brand Team | Initial release |
 
 ---
 
-*MeshThrift Brand Identity System — Confidential*
-*© MeshThrift — All rights reserved*
+_MeshThrift Brand Identity System — Confidential_
+_© MeshThrift — All rights reserved_
 
 ---
 
