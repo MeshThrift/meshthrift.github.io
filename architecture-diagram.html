@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>production-ai-app · Architecture</title>
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--text3:#6e7681;--purple:#a371f7;--teal:#39d353;--coral:#ff7b72;--amber:#e3b341;--blue:#58a6ff;--pink:#f778ba;--green:#56d364}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.5;padding:24px}
+h1{font-size:18px;font-weight:600;margin-bottom:4px}
+.subtitle{color:var(--text2);font-size:13px;margin-bottom:20px;display:flex;gap:8px;align-items:center}
+.badge{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:2px 9px;font-size:11px;color:var(--text2)}
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab{background:transparent;border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s}
+.tab:hover{border-color:var(--blue);color:var(--blue)}
+.tab.active{background:var(--blue);border-color:var(--blue);color:#000;font-weight:500}
+.canvas{width:100%;overflow-x:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px}
+svg text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.ng{cursor:pointer}
+.ng rect{transition:filter .15s}
+.ng:hover rect{filter:brightness(1.25)}
+.detail{margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;min-height:80px}
+.detail h3{font-size:13px;font-weight:600;margin-bottom:5px;color:var(--text)}
+.detail p{font-size:12px;color:var(--text2);line-height:1.6}
+.tags{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.tag{font-size:11px;padding:2px 8px;border-radius:8px;font-weight:500}
+.tp{background:#2d2166;color:#a371f7}
+.tt{background:#0d3320;color:#39d353}
+.tc{background:#3d1210;color:#ff7b72}
+.ta{background:#3d2c0a;color:#e3b341}
+.tb{background:#0d2a45;color:#58a6ff}
+.tk{background:#3d1630;color:#f778ba}
+.tg{background:#21262d;color:#8b949e}
+.constraint-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:16px}
+.c-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px}
+.c-card .icon{font-size:16px;margin-bottom:6px}
+.c-card h4{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
+.c-card p{font-size:11px;color:var(--text2);line-height:1.5}
+</style>
+</head>
+<body>
+<h1>production-ai-app</h1>
+<div class="subtitle">
+  <span>Production RAG Agent System</span>
+  <span class="badge">FastAPI</span>
+  <span class="badge">Docker</span>
+  <span class="badge">OpenTelemetry</span>
+  <span class="badge">Redis</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="showView('flow',this)">Request flow</button>
+  <button class="tab" onclick="showView('modules',this)">Module map</button>
+  <button class="tab" onclick="showView('security',this)">Security layers</button>
+  <button class="tab" onclick="showView('infra',this)">Infrastructure</button>
+  <button class="tab" onclick="showView('constraints',this)">Constraints</button>
+</div>
+<div class="canvas" id="cv"></div>
+<div class="detail">
+  <h3 id="dt">Click any component to explore</h3>
+  <p id="dd">This interactive diagram covers the full production-ai-app RAG system. Click any highlighted node to see its file, responsibilities, and implementation constraints.</p>
+  <div class="tags" id="dtg"></div>
+</div>
+
+<script>
+const D={
+input_guard:{t:'app/security/input_guard.py',d:'First gate on every request. Validates and sanitizes user input. Blocks prompt injection patterns, enforces max token limits, detects jailbreak attempts via classifier + rule set. No request proceeds without passing this gate.',tags:[['Security guard','tc'],['Pre-LLM','ta'],['Every request','tg']]},
+query_rewriter:{t:'app/services/query_rewriter.py',d:'Rewrites ambiguous or underspecified queries using an LLM. Supports HyDE (Hypothetical Document Embedding) for better dense retrieval alignment, and standalone question reformulation to resolve conversational pronouns.',tags:[['LLM call','tb'],['HyDE','tt'],['services/','tg']]},
+semantic_cache:{t:'app/services/semantic_cache.py',d:'Embedding-based semantic cache. Computes cosine similarity of incoming query against cached embeddings in Redis. Cache hits short-circuit the entire pipeline. TTL and similarity threshold configurable via config.py.',tags:[['Redis','ta'],['Skip pipeline','tt'],['Configurable','tg']]},
+query_router:{t:'app/services/query_router.py',d:'Rule-based + LLM-assisted routing determines retrieval path: vector DB, web search, code search, or direct LLM answer. All routing thresholds and rules live in config.py — zero hardcoded values.',tags:[['Routing','tt'],['LLM-assisted','tb'],['Configurable','tg']]},
+hybrid_retriever:{t:'app/components/hybrid_retriever.py',d:'Hybrid search combining dense vector retrieval (pgvector or Pinecone) with sparse BM25 keyword retrieval. Results merged using Reciprocal Rank Fusion (RRF). Configurable top_k and alpha weight between dense/sparse legs.',tags:[['RRF fusion','tp'],['BM25 + Dense','tt'],['components/','tg']]},
+document_grader:{t:'app/agents/document_grader.py',d:'LLM-based grader scores each retrieved document against the query — returns relevant / not_relevant with confidence. Filters out irrelevant documents before generation, directly reducing hallucination risk.',tags:[['LLM call','tb'],['Self-correcting','tp'],['agents/','tg']]},
+reranker:{t:'app/components/reranker.py',d:'Cross-encoder reranking via ms-marco-MiniLM or Cohere Rerank API. Accepts query + graded candidates, returns scored and sorted list. Score thresholding prevents low-confidence docs from reaching the generator.',tags:[['Cross-encoder','tp'],['Threshold','ta'],['components/','tg']]},
+adaptive_router:{t:'app/agents/adaptive_router.py',d:'Self-reflection agent. If graded documents are insufficient, triggers fallback mid-pipeline: web search, query rewrite + retry, or direct LLM answer. The system diagnoses and heals poor retrieval quality before generation.',tags:[['Self-healing','tp'],['Fallback loop','tc'],['agents/','tg']]},
+rag_pipeline:{t:'app/services/rag_pipeline.py',d:'Top-level orchestrator: rewrite → route → retrieve → grade → rerank → generate. Returns a structured QueryResponse. Every stage emits an OpenTelemetry span. Fully async. Handles all fallback paths.',tags:[['Orchestrator','tb'],['OTel spans','tk'],['Async-first','tt']]},
+output_filter:{t:'app/security/output_filter.py',d:'Post-generation guard. Checks LLM response for hallucination signals, PII leakage, and policy violations. Can trigger regeneration or serve a safe fallback response. Runs on every outgoing response.',tags:[['Security guard','tc'],['Every response','tp'],['Regen trigger','ta']]},
+tracer:{t:'observability/tracer.py + cost_tracker.py',d:'OTel distributed tracing creates spans per stage with LLM attributes: model, tokens in/out, latency. Exports to Jaeger, Datadog, or Langfuse. cost_tracker.py logs token usage and estimated cost per request, per user, per stage.',tags:[['OTel','tk'],['Cost-aware','ta'],['Every LLM call','tg']]},
+content_filter:{t:'app/security/content_filter.py',d:'Filters retrieved documents before the LLM sees them. Strips PII and toxic content using regex rules + an LLM classifier. Prevents poisoned or policy-violating context from affecting generation.',tags:[['Security guard','tc'],['Pre-generation','ta'],['security/','tg']]},
+vector_search:{t:'app/agents/tools/vector_search.py',d:'Pluggable tool wrapper for vector DB retrieval. Returns List[Document] with metadata and similarity scores. Injectable interface — swap vector DB backends without changing any agent code.',tags:[['Pluggable','tp'],['Injectable','tt'],['tools/','tg']]},
+web_search:{t:'app/agents/tools/web_search.py',d:'Live web search wrapper (Tavily, Serper, or Brave Search API). Returns structured results: URL, title, snippet. Used by adaptive_router as fallback when vector retrieval quality is too low.',tags:[['Fallback','tc'],['Pluggable','tp'],['tools/','tg']]},
+code_search:{t:'app/agents/tools/code_search.py',d:'Code-specific search via GitHub API or local code index. Returns code snippets with file path and line references. Activated by query_router when query domain is detected as code.',tags:[['GitHub API','tb'],['Pluggable','tp'],['tools/','tg']]},
+evaluation:{t:'evaluation/',d:'offline_eval.py runs RAGAS metrics (faithfulness, answer relevancy, context precision/recall) against golden_dataset.json. online_monitor.py samples live traffic async and scores quality in the background. All results versioned by git SHA in eval_results/.',tags:[['RAGAS metrics','tt'],['Versioned','ta'],['CI-ready','tb']]},
+observability:{t:'observability/',d:'tracer.py (OTel spans per stage), feedback.py (thumbs up/down captured to Postgres/Redis), cost_tracker.py (per-request token + USD cost, daily/monthly aggregates, budget alerts). Every single LLM call logs tokens.',tags:[['OTel','tk'],['Feedback loop','tk'],['Cost tracking','ta']]},
+frontend:{t:'frontend/',d:'Streamlit or Gradio chat UI containerized separately. Displays source citations, feedback buttons, conversation history, and per-request cost. Communicates with app/ over the internal Docker network.',tags:[['Separate container','tg'],['Feedback','tk'],['Gradio/Streamlit','tb']]},
+conversation:{t:'app/services/conversation.py',d:'Per-session conversation history stored in Redis keyed by session_id. Implements sliding window or LLM-based summarization to stay within context window limits. Injects history into query_rewriter context.',tags:[['Redis','ta'],['Session-aware','tt'],['services/','tg']]},
+prompts:{t:'app/prompts/templates.py + registry.py',d:'All prompt templates as typed dataclasses with system, user, and context_injection fields. Central registry loads by name and version. Supports hot-swapping without restart via config file watch or remote config.',tags:[['Hot-swappable','tt'],['Versioned','ta'],['prompts/','tg']]},
+};
+
+function pick(key){
+  const d=D[key];if(!d)return;
+  document.getElementById('dt').textContent=d.t;
+  document.getElementById('dd').textContent=d.d;
+  document.getElementById('dtg').innerHTML=d.tags.map(([l,c])=>`<span class="tag ${c}">${l}</span>`).join('');
+}
+
+const C='#30363d';
+const T=(x,y,txt,bold,size,col)=>`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="${size||12}" font-weight="${bold?600:400}" fill="${col||'#e6edf3'}">${txt}</text>`;
+const R=(x,y,w,h,fill,stroke,key,label,sub)=>`<g class="ng" onclick="pick('${key}')"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${fill}" stroke="${stroke}" stroke-width="0.8"/>${T(x+w/2,y+(sub?h*0.38:h/2),label,true,12,stroke)}${sub?T(x+w/2,y+h*0.68,sub,false,10,stroke):''}</g>`;
+const L=(x1,y1,x2,y2,col,dash)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col||C}" stroke-width="0.8" ${dash?'stroke-dasharray="4 3"':''} marker-end="url(#a)"/>`;
+const DEFS=`<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>`;
+
+const V={
+flow:`<svg width="100%" viewBox="0 0 680 620" role="img">
+${DEFS}
+<rect x="264" y="8" width="152" height="34" rx="8" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
+${T(340,25,'User query',true,12,'#8b949e')}
+${L(340,42,340,60)}
+${R(210,62,260,46,'#3d1210','#ff7b72','input_guard','input_guard.py','injection · jailbreak · tokens')}
+${L(340,108,340,126)}
+${R(210,128,260,46,'#0d2a45','#58a6ff','query_rewriter','query_rewriter.py','HyDE · standalone reformulation')}
+${L(340,174,340,192)}
+${R(210,194,260,46,'#3d2c0a','#e3b341','semantic_cache','semantic_cache.py','Redis · cosine sim · TTL')}
+<path d="M470 217 L550 217 L550 568 L470 568" fill="none" stroke="#e3b341" stroke-width="0.7" stroke-dasharray="4 3" marker-end="url(#a)" opacity="0.5"/>
+<text x="558" y="395" font-size="10" fill="#e3b341" font-family="-apple-system,sans-serif">cache hit</text>
+${L(340,240,340,258)}
+${R(210,260,260,46,'#0d3320','#39d353','query_router','query_router.py','vector · web · code · direct')}
+${L(340,306,340,324)}
+${R(190,326,300,46,'#2d2166','#a371f7','hybrid_retriever','hybrid_retriever.py','Dense + BM25 · RRF fusion')}
+${L(340,372,340,390)}
+${R(72,392,200,46,'#2d2166','#a371f7','document_grader','document_grader.py','relevant / not_relevant')}
+${R(408,392,200,46,'#2d2166','#a371f7','reranker','reranker.py','cross-encoder · threshold')}
+<line x1="272" y1="415" x2="408" y2="415" stroke="${C}" stroke-width="0.7" stroke-dasharray="3 2" marker-end="url(#a)"/>
+${R(72,456,200,38,'#3d1630','#f778ba','adaptive_router','adaptive_router.py','self-reflection · fallback')}
+<path d="M172 456 L172 438 L272 438" fill="none" stroke="#f778ba" stroke-width="0.7" stroke-dasharray="3 2" marker-end="url(#a)" opacity="0.6"/>
+<line x1="508" y1="438" x2="508" y2="526" stroke="${C}" stroke-width="0.7"/>
+<line x1="508" y1="526" x2="414" y2="526" stroke="${C}" stroke-width="0.8" marker-end="url(#a)"/>
+${R(224,510,180,38,'#0d3320','#39d353','rag_pipeline','rag_pipeline.py','')}
+${L(314,548,314,566)}
+${R(224,568,180,34,'#3d1210','#ff7b72','output_filter','output_filter.py','')}
+<rect x="12" y="126" width="56" height="396" rx="8" fill="#161b22" stroke="#30363d" stroke-width="0.5" stroke-dasharray="3 2"/>
+<g class="ng" onclick="pick('tracer')">
+<text x="40" y="324" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif" transform="rotate(-90,40,324)">tracer.py · cost_tracker · OTel spans</text>
+</g>
+</svg>`,
+
+modules:`<svg width="100%" viewBox="0 0 680 500" role="img">
+${DEFS}
+<rect x="12" y="12" width="330" height="218" rx="12" fill="#161b22" stroke="${C}" stroke-width="0.5"/>
+<text x="24" y="28" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">app/ — services + components</text>
+${R(24,36,150,30,'#0d3320','#39d353','rag_pipeline','rag_pipeline.py','')}
+${R(184,36,148,30,'#0d2a45','#58a6ff','conversation','conversation.py','')}
+${R(24,76,150,30,'#0d2a45','#58a6ff','query_rewriter','query_rewriter.py','')}
+${R(184,76,148,30,'#0d3320','#39d353','query_router','query_router.py','')}
+${R(24,116,150,30,'#3d2c0a','#e3b341','semantic_cache','semantic_cache.py','')}
+${R(184,116,148,30,'#2d2166','#a371f7','hybrid_retriever','hybrid_retriever.py','')}
+${R(24,156,150,30,'#2d2166','#a371f7','reranker','reranker.py','')}
+${R(184,156,148,30,'#3d1030','#f778ba','prompts','prompts/ registry','')}
+<rect x="338" y="12" width="330" height="218" rx="12" fill="#161b22" stroke="${C}" stroke-width="0.5"/>
+<text x="350" y="28" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">app/agents/ — intelligence + tools</text>
+${R(350,36,150,30,'#2d2166','#a371f7','document_grader','document_grader.py','')}
+${R(510,36,148,30,'#3d1630','#f778ba','adaptive_router','adaptive_router.py','')}
+${R(350,76,90,30,'#21262d','#8b949e','vector_search','vector_search','')}
+${R(450,76,90,30,'#21262d','#8b949e','web_search','web_search','')}
+${R(550,76,118,30,'#21262d','#8b949e','code_search','code_search','')}
+<text x="350" y="124" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">tools/ — pluggable · injectable · mockable</text>
+<rect x="12" y="242" width="330" height="102" rx="12" fill="#161b22" stroke="#ff7b72" stroke-width="0.5" stroke-dasharray="4 2"/>
+<text x="24" y="258" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">app/security/ — three guard layers</text>
+${R(24,266,94,64,'#3d1210','#ff7b72','input_guard','input_guard','pre-LLM')}
+${R(128,266,94,64,'#3d1210','#ff7b72','content_filter','content_filter','docs filter')}
+${R(232,266,100,64,'#3d1210','#ff7b72','output_filter','output_filter','post-gen')}
+<rect x="338" y="242" width="330" height="102" rx="12" fill="#161b22" stroke="${C}" stroke-width="0.5"/>
+<text x="350" y="258" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">observability/ + evaluation/</text>
+${R(350,266,94,64,'#3d1630','#f778ba','tracer','tracer.py','OTel spans')}
+${R(454,266,100,64,'#3d1630','#f778ba','observability','cost+feedback','every LLM call')}
+${R(564,266,94,64,'#0d3320','#39d353','evaluation','evaluation/','RAGAS · CI')}
+<rect x="12" y="356" width="656" height="60" rx="10" fill="#161b22" stroke="${C}" stroke-width="0.5"/>
+<text x="24" y="372" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">infrastructure + dx</text>
+${R(24,378,106,28,'#0d2a45','#58a6ff','frontend','frontend/','')}
+<rect x="140" y="378" width="106" height="28" rx="6" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
+<text x="193" y="392" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#8b949e" font-family="-apple-system,sans-serif">docker-compose</text>
+<rect x="256" y="378" width="96" height="28" rx="6" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
+<text x="304" y="392" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#8b949e" font-family="-apple-system,sans-serif">pyproject.toml</text>
+<rect x="362" y="378" width="86" height="28" rx="6" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
+<text x="405" y="392" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#8b949e" font-family="-apple-system,sans-serif">tests/ pytest</text>
+<rect x="458" y="378" width="76" height="28" rx="6" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
+<text x="496" y="392" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#8b949e" font-family="-apple-system,sans-serif">scripts/</text>
+<rect x="544" y="378" width="116" height="28" rx="6" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
+<text x="602" y="392" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#8b949e" font-family="-apple-system,sans-serif">.claude/ AGENTS.md</text>
+<text x="340" y="456" text-anchor="middle" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">Color: purple = retrieval/agents · green = pipeline/services · red = security · pink = observability · blue = external/config</text>
+</svg>`,
+
+security:`<svg width="100%" viewBox="0 0 680 420" role="img">
+${DEFS}
+<line x1="340" y1="16" x2="340" y2="402" stroke="#30363d" stroke-width="0.8" stroke-dasharray="3 3"/>
+<rect x="264" y="4" width="152" height="30" rx="8" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
+${T(340,19,'Incoming query',false,11,'#8b949e')}
+${L(340,34,340,54,'#30363d')}
+<g class="ng" onclick="pick('input_guard')">
+<rect x="170" y="56" width="340" height="78" rx="10" fill="#3d1210" stroke="#ff7b72" stroke-width="0.8"/>
+${T(340,82,'Layer 1 · input_guard.py',true,13,'#ff7b72')}
+${T(340,102,'Prompt injection · jailbreaks · max tokens · sanitize',false,11,'#ff7b72')}
+${T(340,118,'Rejects unconditionally — nothing passes without approval',false,10,'#8b949e')}
+</g>
+<text x="80" y="82" text-anchor="middle" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">injection</text>
+<line x1="168" y1="80" x2="104" y2="80" stroke="#ff7b72" stroke-width="0.7" marker-end="url(#a)" opacity="0.6"/>
+<text x="80" y="100" text-anchor="middle" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">jailbreak</text>
+<line x1="168" y1="98" x2="104" y2="98" stroke="#ff7b72" stroke-width="0.7" marker-end="url(#a)" opacity="0.6"/>
+${L(340,134,340,158,'#30363d')}
+<text x="350" y="150" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">retrieve docs</text>
+<g class="ng" onclick="pick('content_filter')">
+<rect x="170" y="160" width="340" height="78" rx="10" fill="#3d1210" stroke="#ff7b72" stroke-width="0.8"/>
+${T(340,186,'Layer 2 · content_filter.py',true,13,'#ff7b72')}
+${T(340,206,'PII strip · toxic content · policy violations in docs',false,11,'#ff7b72')}
+${T(340,222,'Runs on retrieved context before LLM sees it',false,10,'#8b949e')}
+</g>
+<text x="600" y="186" text-anchor="middle" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">PII in docs</text>
+<line x1="512" y1="184" x2="570" y2="184" stroke="#ff7b72" stroke-width="0.7" marker-end="url(#a)" opacity="0.6"/>
+<text x="600" y="206" text-anchor="middle" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">toxic text</text>
+<line x1="512" y1="204" x2="570" y2="204" stroke="#ff7b72" stroke-width="0.7" marker-end="url(#a)" opacity="0.6"/>
+${L(340,238,340,262,'#30363d')}
+<text x="350" y="254" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">LLM generate</text>
+<g class="ng" onclick="pick('output_filter')">
+<rect x="170" y="264" width="340" height="78" rx="10" fill="#3d1210" stroke="#ff7b72" stroke-width="0.8"/>
+${T(340,290,'Layer 3 · output_filter.py',true,13,'#ff7b72')}
+${T(340,310,'Hallucination signals · PII leakage · policy check',false,11,'#ff7b72')}
+${T(340,326,'Can force regeneration or serve safe fallback',false,10,'#8b949e')}
+</g>
+<text x="80" y="290" text-anchor="middle" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">hallucination</text>
+<line x1="168" y1="288" x2="104" y2="288" stroke="#ff7b72" stroke-width="0.7" marker-end="url(#a)" opacity="0.6"/>
+<text x="80" y="310" text-anchor="middle" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">PII leak</text>
+<line x1="168" y1="308" x2="104" y2="308" stroke="#ff7b72" stroke-width="0.7" marker-end="url(#a)" opacity="0.6"/>
+${L(340,342,340,368,'#30363d')}
+<rect x="264" y="370" width="152" height="30" rx="8" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
+${T(340,385,'Response delivered',true,12,'#39d353')}
+</svg>`,
+
+infra:`<svg width="100%" viewBox="0 0 680 410" role="img">
+${DEFS}
+<rect x="12" y="56" width="656" height="302" rx="14" fill="#161b22" stroke="${C}" stroke-width="0.5" stroke-dasharray="6 3"/>
+<text x="24" y="72" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">docker-compose · internal network · healthcheck on all deps</text>
+<g class="ng" onclick="pick('rag_pipeline')">
+<rect x="28" y="80" width="160" height="96" rx="10" fill="#0d3320" stroke="#39d353" stroke-width="0.8"/>
+${T(108,108,'app/',true,14,'#39d353')}
+${T(108,128,'FastAPI · :8000',false,10,'#39d353')}
+${T(108,144,'multi-stage Dockerfile',false,10,'#39d353')}
+${T(108,162,'non-root user',false,10,'#39d353')}
+</g>
+<g class="ng" onclick="pick('frontend')">
+<rect x="28" y="198" width="160" height="74" rx="10" fill="#0d2a45" stroke="#58a6ff" stroke-width="0.8"/>
+${T(108,224,'frontend/',true,14,'#58a6ff')}
+${T(108,244,'Gradio · :7860',false,10,'#58a6ff')}
+${T(108,260,'→ app:8000',false,10,'#58a6ff')}
+</g>
+<g class="ng" onclick="pick('semantic_cache')">
+<rect x="258" y="80" width="136" height="82" rx="10" fill="#3d2c0a" stroke="#e3b341" stroke-width="0.8"/>
+${T(326,112,'redis',true,14,'#e3b341')}
+${T(326,132,'Semantic cache',false,10,'#e3b341')}
+${T(326,148,'Session history',false,10,'#e3b341')}
+</g>
+<g class="ng" onclick="pick('observability')">
+<rect x="258" y="196" width="136" height="82" rx="10" fill="#2d2166" stroke="#a371f7" stroke-width="0.8"/>
+${T(326,228,'postgres',true,14,'#a371f7')}
+${T(326,248,'Feedback store',false,10,'#a371f7')}
+${T(326,264,'Alembic migrations',false,10,'#a371f7')}
+</g>
+<g class="ng" onclick="pick('hybrid_retriever')">
+<rect x="464" y="80" width="186" height="82" rx="10" fill="#2d2166" stroke="#a371f7" stroke-width="0.8"/>
+${T(557,110,'vector-db (Qdrant)',true,13,'#a371f7')}
+${T(557,130,'Dense vector index',false,10,'#a371f7')}
+${T(557,148,'pgvector / Pinecone',false,10,'#a371f7')}
+</g>
+<rect x="464" y="196" width="186" height="82" rx="10" fill="#21262d" stroke="${C}" stroke-width="0.5" stroke-dasharray="3 2"/>
+${T(557,226,'LLM API (external)',true,13,'#8b949e')}
+${T(557,246,'OpenAI / Anthropic',false,10,'#6e7681')}
+${T(557,264,'keys via config.py only',false,10,'#6e7681')}
+<line x1="188" y1="120" x2="256" y2="120" stroke="${C}" stroke-width="0.8" marker-end="url(#a)"/>
+<line x1="188" y1="152" x2="256" y2="237" stroke="${C}" stroke-width="0.8" marker-end="url(#a)"/>
+<line x1="394" y1="120" x2="462" y2="120" stroke="${C}" stroke-width="0.8" marker-end="url(#a)"/>
+<line x1="394" y1="152" x2="462" y2="237" stroke="${C}" stroke-width="0.8" marker-end="url(#a)"/>
+<rect x="246" y="6" width="188" height="32" rx="8" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
+${T(340,22,'User (browser / API client)',false,11,'#8b949e')}
+<line x1="290" y1="38" x2="108" y2="54" stroke="${C}" stroke-width="0.8" marker-end="url(#a)" opacity="0.5"/>
+<text x="196" y="48" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif" transform="rotate(-7,196,48)">:7860 or :8000</text>
+<text x="340" y="375" text-anchor="middle" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">scripts/healthcheck.py verifies all external deps at startup: vector DB · Redis · LLM API · web search API</text>
+</svg>`,
+
+constraints:`<div style="padding:4px 0">
+<div class="constraint-grid">
+<div class="c-card"><div class="icon">⚡</div><h4>Async-first</h4><p>All I/O-bound operations use async/await — LLM calls, DB queries, cache reads, web search. No blocking calls allowed.</p></div>
+<div class="c-card"><div class="icon">🔒</div><h4>Type-safe</h4><p>Full type annotations on all functions. mypy runs in strict mode as part of CI. Pydantic for all request/response I/O.</p></div>
+<div class="c-card"><div class="icon">📡</div><h4>Observable</h4><p>Every pipeline stage emits an OpenTelemetry span with LLM-specific attributes: model, tokens in/out, latency, stage name.</p></div>
+<div class="c-card"><div class="icon">🔧</div><h4>Configurable</h4><p>Zero hardcoded model names, thresholds, or API URLs. Everything flows through config.py loaded from environment variables.</p></div>
+<div class="c-card"><div class="icon">🧪</div><h4>Testable</h4><p>All external services (LLM, vector DB, Redis, web search) are injectable and mockable. 80% coverage threshold enforced.</p></div>
+<div class="c-card"><div class="icon">🛡️</div><h4>Secure</h4><p>input_guard.py and output_filter.py run on every request/response. No PII in logs. Three guard layers total.</p></div>
+<div class="c-card"><div class="icon">💰</div><h4>Cost-aware</h4><p>Every LLM call logs token counts to cost_tracker.py. Per-request, per-user, per-stage aggregates. Budget alerts configurable.</p></div>
+<div class="c-card"><div class="icon">🔄</div><h4>Self-healing</h4><p>adaptive_router.py detects poor retrieval quality mid-pipeline and triggers fallback paths before generation begins.</p></div>
+</div>
+</div>`
+};
+
+function showView(v,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cv').innerHTML=V[v];
+  document.getElementById('dt').textContent='Click any component';
+  document.getElementById('dd').textContent='Click any highlighted module to see its file path, responsibilities, and implementation details.';
+  document.getElementById('dtg').innerHTML='';
+}
+document.getElementById('cv').innerHTML=V.flow;
+</script>
+</body>
+</html>
