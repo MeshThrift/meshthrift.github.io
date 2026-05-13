@@ -3,300 +3,2477 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>production-ai-app · Architecture</title>
+<title>MeshThrift — Brand Identity System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--text3:#6e7681;--purple:#a371f7;--teal:#39d353;--coral:#ff7b72;--amber:#e3b341;--blue:#58a6ff;--pink:#f778ba;--green:#56d364}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.5;padding:24px}
-h1{font-size:18px;font-weight:600;margin-bottom:4px}
-.subtitle{color:var(--text2);font-size:13px;margin-bottom:20px;display:flex;gap:8px;align-items:center}
-.badge{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:2px 9px;font-size:11px;color:var(--text2)}
-.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
-.tab{background:transparent;border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s}
-.tab:hover{border-color:var(--blue);color:var(--blue)}
-.tab.active{background:var(--blue);border-color:var(--blue);color:#000;font-weight:500}
-.canvas{width:100%;overflow-x:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px}
-svg text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
-.ng{cursor:pointer}
-.ng rect{transition:filter .15s}
-.ng:hover rect{filter:brightness(1.25)}
-.detail{margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;min-height:80px}
-.detail h3{font-size:13px;font-weight:600;margin-bottom:5px;color:var(--text)}
-.detail p{font-size:12px;color:var(--text2);line-height:1.6}
-.tags{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-.tag{font-size:11px;padding:2px 8px;border-radius:8px;font-weight:500}
-.tp{background:#2d2166;color:#a371f7}
-.tt{background:#0d3320;color:#39d353}
-.tc{background:#3d1210;color:#ff7b72}
-.ta{background:#3d2c0a;color:#e3b341}
-.tb{background:#0d2a45;color:#58a6ff}
-.tk{background:#3d1630;color:#f778ba}
-.tg{background:#21262d;color:#8b949e}
-.constraint-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:16px}
-.c-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px}
-.c-card .icon{font-size:16px;margin-bottom:6px}
-.c-card h4{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
-.c-card p{font-size:11px;color:var(--text2);line-height:1.5}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --navy: #020c1b;
+  --navy-2: #030f21;
+  --navy-3: #061529;
+  --navy-4: #0a1f3a;
+  --navy-5: #0d2545;
+  --cyan: #00d4ff;
+  --cyan-dim: rgba(0,212,255,0.6);
+  --cyan-glow: rgba(0,212,255,0.15);
+  --blue: #0066ff;
+  --blue-bright: #1a7fff;
+  --blue-dim: rgba(0,102,255,0.4);
+  --purple: #7b2fff;
+  --purple-dim: rgba(123,47,255,0.3);
+  --white: #f0f8ff;
+  --white-dim: rgba(240,248,255,0.6);
+  --white-faint: rgba(240,248,255,0.12);
+  --grid: rgba(0,212,255,0.06);
+  --grid-bright: rgba(0,212,255,0.12);
+  --edge: rgba(0,212,255,0.18);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 400;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ─── GLOBAL CANVAS LAYER ─── */
+#global-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.page-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── SECTION LAYOUT ─── */
+section {
+  padding: 80px 0;
+  position: relative;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+/* ─── SECTION LABELS ─── */
+.section-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  opacity: 0.7;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-tag::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 1px;
+  background: var(--cyan);
+  opacity: 0.5;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+.section-subtitle {
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--white-dim);
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+/* ─── DIVIDER ─── */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--edge) 20%, var(--edge) 80%, transparent 100%);
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 1: HERO / LOGO
+───────────────────────────────────────── */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* ─── LOGO MARK ─── */
+.logo-mark-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 40px;
+}
+
+#logo-svg {
+  width: 120px;
+  height: 120px;
+  filter: drop-shadow(0 0 24px rgba(0,212,255,0.45)) drop-shadow(0 0 60px rgba(0,102,255,0.25));
+}
+
+.logo-mark-ring {
+  position: absolute;
+  inset: -20px;
+  border: 1px solid rgba(0,212,255,0.15);
+  border-radius: 50%;
+  animation: ring-spin 20s linear infinite;
+}
+.logo-mark-ring::before {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--cyan);
+  border-radius: 50%;
+  top: -3px;
+  left: calc(50% - 3px);
+  box-shadow: 0 0 10px var(--cyan);
+}
+
+@keyframes ring-spin { to { transform: rotate(360deg); } }
+
+/* ─── WORDMARK ─── */
+.hero-wordmark {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(52px, 9vw, 120px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  background: linear-gradient(135deg, #ffffff 0%, #a8d8ff 40%, #00d4ff 70%, #0066ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.hero-tagline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  opacity: 0.7;
+  margin-bottom: 40px;
+}
+
+.hero-descriptor {
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--white-dim);
+  max-width: 480px;
+  line-height: 1.75;
+  margin-bottom: 56px;
+}
+
+/* ─── HERO STATS ─── */
+.hero-stats {
+  display: flex;
+  gap: 60px;
+  align-items: center;
+}
+.hero-stat {
+  text-align: center;
+}
+.hero-stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.hero-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  margin-top: 6px;
+  opacity: 0.6;
+}
+.hero-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--edge);
+}
+
+/* ─────────────────────────────────────────
+   SECTION 2: LOGO SYSTEM
+───────────────────────────────────────── */
+#logo-system {
+  background: var(--navy-2);
+}
+
+.logo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 48px;
+}
+
+.logo-cell {
+  padding: 52px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-cell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--grid) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.logo-cell-dark { background: #020a16; }
+.logo-cell-mid { background: #061529; }
+.logo-cell-light { background: #f0f4f8; }
+
+.logo-cell-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  opacity: 0.5;
+}
+.logo-cell-light .logo-cell-label { color: #666; opacity: 0.7; }
+
+.wordmark-lockup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.wordmark-text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.wm-large { font-size: 36px; }
+.wm-medium { font-size: 28px; }
+
+.wm-light {
+  background: linear-gradient(120deg, #fff 0%, #a8d8ff 50%, #00d4ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.wm-dark { color: #0a1f3a; }
+.wm-mono { color: #fff; }
+
+.logo-mark-sm svg {
+  filter: drop-shadow(0 0 14px rgba(0,212,255,0.5));
+}
+
+.logo-cell-light .logo-mark-sm svg {
+  filter: none;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 3: COLOR SYSTEM
+───────────────────────────────────────── */
+#color-system { background: var(--navy); }
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  margin-top: 48px;
+}
+
+.color-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.color-swatch {
+  height: 120px;
+  position: relative;
+}
+
+.color-swatch-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 10px;
+}
+
+.color-hex {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.45);
+}
+
+.color-info {
+  padding: 14px 16px;
+  background: var(--navy-3);
+}
+
+.color-name {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 2px;
+  letter-spacing: 0.02em;
+}
+
+.color-role {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  opacity: 0.5;
+}
+
+/* Color values */
+.sw-navy { background: #020c1b; }
+.sw-deepblue { background: #030f21; }
+.sw-electricblue { background: linear-gradient(145deg, #0044cc, #0066ff); }
+.sw-cyan { background: linear-gradient(145deg, #00aadd, #00d4ff); }
+.sw-purple { background: linear-gradient(145deg, #5a1fd4, #7b2fff); }
+
+/* Extra color chips row */
+.color-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Tonal scales */
+.tonal-section {
+  margin-top: 52px;
+}
+
+.tonal-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  opacity: 0.6;
+  margin-bottom: 12px;
+}
+
+.tonal-strip {
+  display: flex;
+  gap: 2px;
+  border-radius: 4px;
+  overflow: hidden;
+  height: 40px;
+}
+
+.tonal-step {
+  flex: 1;
+  height: 100%;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 4: TYPOGRAPHY
+───────────────────────────────────────── */
+#typography { background: var(--navy-2); }
+
+.type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-top: 48px;
+}
+
+.type-block {
+  padding: 48px 40px;
+  background: var(--navy-3);
+  position: relative;
+  overflow: hidden;
+}
+
+.type-block::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--grid-bright);
+}
+
+.type-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  opacity: 0.55;
+  margin-bottom: 28px;
+  display: flex;
+  gap: 20px;
+}
+
+.type-sample-display {
+  font-family: 'Syne', sans-serif;
+  font-size: 64px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.88;
+  background: linear-gradient(120deg, var(--white) 0%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 20px;
+}
+
+.type-sample-body {
+  font-family: 'Barlow', sans-serif;
+  font-size: 24px;
+  font-weight: 300;
+  color: var(--white-dim);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.type-sample-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--cyan);
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+}
+
+.type-sample-condensed {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 80px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.08);
+  line-height: 0.85;
+  letter-spacing: -0.02em;
+  position: absolute;
+  bottom: -8px;
+  right: -4px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.type-scale {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 48px;
+}
+
+.type-scale-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px;
+  align-items: baseline;
+  gap: 24px;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(0,212,255,0.07);
+}
+
+.type-scale-size {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--cyan);
+  opacity: 0.5;
+  letter-spacing: 0.15em;
+}
+
+.type-scale-sample {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--white);
+}
+
+.type-scale-role {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  opacity: 0.35;
+  text-align: right;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 5: MESH PATTERN LIBRARY
+───────────────────────────────────────── */
+#patterns { background: var(--navy); }
+
+.pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 48px;
+}
+
+.pattern-cell {
+  position: relative;
+  height: 260px;
+  background: var(--navy-3);
+  overflow: hidden;
+}
+
+.pattern-cell canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pattern-label {
+  position: absolute;
+  bottom: 16px;
+  left: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  opacity: 0.5;
+  z-index: 2;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 6: UI COMPONENTS
+───────────────────────────────────────── */
+#components { background: var(--navy-2); }
+
+.component-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-top: 48px;
+}
+
+.component-panel {
+  padding: 40px;
+  background: var(--navy-3);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.component-panel-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  opacity: 0.45;
+}
+
+/* BUTTONS */
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+.btn {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 12px 28px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--cyan);
+  color: var(--navy);
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+}
+.btn-primary:hover { background: #33ddff; transform: translateY(-1px); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--cyan);
+  border: 1px solid rgba(0,212,255,0.35);
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+}
+.btn-secondary:hover { background: rgba(0,212,255,0.08); border-color: var(--cyan); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--white-dim);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,0.25); color: var(--white); }
+
+.btn-danger {
+  background: transparent;
+  color: #ff4455;
+  border: 1px solid rgba(255,68,85,0.35);
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+}
+
+/* BADGES */
+.badge-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.badge-active { background: rgba(0,212,255,0.12); color: var(--cyan); border: 1px solid rgba(0,212,255,0.25); }
+.badge-active::before { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+
+.badge-streaming { background: rgba(0,102,255,0.12); color: #5599ff; border: 1px solid rgba(0,102,255,0.25); }
+.badge-streaming::before { background: #5599ff; }
+
+.badge-error { background: rgba(255,68,85,0.1); color: #ff6677; border: 1px solid rgba(255,68,85,0.2); }
+.badge-error::before { background: #ff4455; }
+
+.badge-pending { background: rgba(255,180,0,0.1); color: #ffb800; border: 1px solid rgba(255,180,0,0.2); }
+.badge-pending::before { background: #ffb800; }
+
+.badge-neutral { background: rgba(255,255,255,0.05); color: var(--white-dim); border: 1px solid rgba(255,255,255,0.1); }
+.badge-neutral::before { background: var(--white-dim); opacity: 0.5; }
+
+/* METRICS CARD */
+.metric-card {
+  background: var(--navy-4);
+  border: 1px solid var(--edge);
+  padding: 24px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+}
+
+.metric-card-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  opacity: 0.5;
+  margin-bottom: 10px;
+}
+
+.metric-card-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--cyan);
+  line-height: 1;
+}
+
+.metric-card-sub {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  color: var(--white-dim);
+  opacity: 0.4;
+  margin-top: 4px;
+}
+
+.metric-card-delta {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: #00ff88;
+  opacity: 0.7;
+}
+
+.metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+/* INPUT */
+.input-field {
+  width: 100%;
+  background: var(--navy-4);
+  border: 1px solid rgba(0,212,255,0.18);
+  color: var(--white);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  padding: 13px 16px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-field:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 1px rgba(0,212,255,0.2), 0 0 20px rgba(0,212,255,0.06);
+}
+.input-field::placeholder { color: rgba(255,255,255,0.2); }
+
+.input-group { display: flex; gap: 8px; }
+.input-group .input-field { flex: 1; }
+
+/* ─────────────────────────────────────────
+   SECTION 7: ICON LANGUAGE
+───────────────────────────────────────── */
+#icons { background: var(--navy); }
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2px;
+  margin-top: 48px;
+}
+
+.icon-cell {
+  padding: 32px 16px;
+  background: var(--navy-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.icon-cell svg {
+  width: 32px;
+  height: 32px;
+  stroke: var(--cyan);
+  fill: none;
+  stroke-width: 1.2;
+  filter: drop-shadow(0 0 8px rgba(0,212,255,0.4));
+}
+
+.icon-cell-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  opacity: 0.4;
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 8: BRAND IN CONTEXT
+───────────────────────────────────────── */
+#context { background: var(--navy-2); }
+
+.context-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  margin-top: 48px;
+}
+
+/* DASHBOARD MOCKUP */
+.dashboard-mockup {
+  background: #010913;
+  padding: 0;
+  border: 1px solid rgba(0,212,255,0.08);
+  overflow: hidden;
+}
+
+.dash-header {
+  background: rgba(0,212,255,0.04);
+  border-bottom: 1px solid rgba(0,212,255,0.1);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dash-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--white);
+}
+
+.dash-logo span { color: var(--cyan); }
+
+.dash-nav {
+  display: flex;
+  gap: 24px;
+}
+
+.dash-nav-item {
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+
+.dash-nav-item.active { color: var(--cyan); }
+
+.dash-body { padding: 24px 20px; }
+
+.dash-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.dash-metric {
+  background: rgba(0,212,255,0.04);
+  border: 1px solid rgba(0,212,255,0.1);
+  padding: 16px;
+}
+
+.dash-metric-v {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.dash-metric-l {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-top: 6px;
+}
+
+.dash-chart-area {
+  background: rgba(0,212,255,0.02);
+  border: 1px solid rgba(0,212,255,0.08);
+  height: 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dash-chart-area canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* API CARD MOCKUP */
+.api-mockup {
+  background: #010913;
+  padding: 0;
+  border: 1px solid rgba(0,212,255,0.08);
+  overflow: hidden;
+}
+
+.api-header {
+  background: rgba(0,212,255,0.04);
+  border-bottom: 1px solid rgba(0,212,255,0.1);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.api-method {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--navy);
+  background: var(--cyan);
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+.api-path {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+}
+
+.api-path span { color: rgba(0,212,255,0.8); }
+
+.api-body {
+  padding: 20px;
+}
+
+.api-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.5);
+}
+
+.api-key { color: #7799ff; }
+.api-val-str { color: #ffcc66; }
+.api-val-num { color: #ff9966; }
+.api-val-bool { color: #ff6699; }
+.api-comment { color: rgba(255,255,255,0.2); }
+.api-result { color: var(--cyan); }
+
+/* ─────────────────────────────────────────
+   SECTION 9: MOTION LANGUAGE
+───────────────────────────────────────── */
+#motion { background: var(--navy); }
+
+.motion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 48px;
+}
+
+.motion-cell {
+  height: 200px;
+  background: var(--navy-3);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.motion-cell canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.motion-label {
+  position: absolute;
+  bottom: 14px;
+  left: 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  opacity: 0.45;
+  z-index: 2;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 10: BRAND VOICE
+───────────────────────────────────────── */
+#voice { background: var(--navy-2); }
+
+.voice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 48px;
+}
+
+.voice-card {
+  padding: 36px 32px;
+  background: var(--navy-3);
+  position: relative;
+  overflow: hidden;
+}
+
+.voice-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+}
+
+.voice-card-a::before { background: var(--cyan); }
+.voice-card-b::before { background: var(--blue); }
+.voice-card-c::before { background: var(--purple); }
+
+.voice-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.voice-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.voice-list li {
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--white-dim);
+  opacity: 0.7;
+  padding-left: 16px;
+  position: relative;
+}
+
+.voice-list li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--cyan);
+  opacity: 0.5;
+  font-size: 10px;
+}
+
+.voice-example {
+  margin-top: 20px;
+  padding: 16px;
+  background: rgba(0,212,255,0.04);
+  border: 1px solid rgba(0,212,255,0.1);
+}
+
+.voice-example-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  opacity: 0.5;
+  margin-bottom: 8px;
+}
+
+.voice-example-text {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--white-dim);
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 11: FOOTER / TAGLINES
+───────────────────────────────────────── */
+#footer-brand {
+  background: #010912;
+  padding: 120px 0 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+#footer-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.35;
+}
+
+.footer-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.footer-logo-large {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(60px, 10vw, 140px);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(0,212,255,0.15) 50%, rgba(0,102,255,0.08) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 32px;
+  user-select: none;
+}
+
+.tagline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 60px;
+}
+
+.tagline-item {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  opacity: 0.45;
+}
+
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.footer-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border: 1px solid rgba(0,212,255,0.2);
+  color: var(--cyan);
+  opacity: 0.5;
+}
 </style>
 </head>
 <body>
-<h1>production-ai-app</h1>
-<div class="subtitle">
-  <span>Production RAG Agent System</span>
-  <span class="badge">FastAPI</span>
-  <span class="badge">Docker</span>
-  <span class="badge">OpenTelemetry</span>
-  <span class="badge">Redis</span>
-</div>
-<div class="tabs">
-  <button class="tab active" onclick="showView('flow',this)">Request flow</button>
-  <button class="tab" onclick="showView('modules',this)">Module map</button>
-  <button class="tab" onclick="showView('security',this)">Security layers</button>
-  <button class="tab" onclick="showView('infra',this)">Infrastructure</button>
-  <button class="tab" onclick="showView('constraints',this)">Constraints</button>
-</div>
-<div class="canvas" id="cv"></div>
-<div class="detail">
-  <h3 id="dt">Click any component to explore</h3>
-  <p id="dd">This interactive diagram covers the full production-ai-app RAG system. Click any highlighted node to see its file, responsibilities, and implementation constraints.</p>
-  <div class="tags" id="dtg"></div>
-</div>
+
+<!-- Fixed mesh background -->
+<canvas id="global-canvas"></canvas>
+
+<div class="page-wrap">
+
+<!-- ════════════════════════════════
+     SECTION 1: HERO
+════════════════════════════════ -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-inner">
+    <div class="logo-mark-wrap">
+      <div class="logo-mark-ring"></div>
+      <svg id="logo-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="lg1" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#00d4ff"/>
+            <stop offset="50%" stop-color="#0066ff"/>
+            <stop offset="100%" stop-color="#7b2fff"/>
+          </linearGradient>
+          <linearGradient id="lg2" x1="120" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#00d4ff" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#0066ff" stop-opacity="0"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- Mesh structure - outer ring of vertices -->
+        <!-- Central octahedron mesh -->
+        <!-- Main triangular faces -->
+        <polygon points="60,14 96,82 24,82" fill="url(#lg2)" stroke="url(#lg1)" stroke-width="0.8" stroke-linejoin="round"/>
+        <polygon points="60,14 96,82 60,106" fill="rgba(0,102,255,0.1)" stroke="url(#lg1)" stroke-width="0.8"/>
+        <polygon points="60,14 24,82 60,106" fill="rgba(0,212,255,0.08)" stroke="url(#lg1)" stroke-width="0.8"/>
+        <polygon points="24,82 96,82 60,106" fill="rgba(0,212,255,0.15)" stroke="url(#lg1)" stroke-width="0.8"/>
+        <!-- Internal cross edges -->
+        <line x1="60" y1="14" x2="60" y2="82" stroke="url(#lg1)" stroke-width="0.6" stroke-dasharray="2 3" opacity="0.6"/>
+        <line x1="60" y1="14" x2="42" y2="48" stroke="url(#lg1)" stroke-width="0.5" stroke-dasharray="2 4" opacity="0.4"/>
+        <line x1="60" y1="14" x2="78" y2="48" stroke="url(#lg1)" stroke-width="0.5" stroke-dasharray="2 4" opacity="0.4"/>
+        <line x1="24" y1="82" x2="78" y2="48" stroke="#00d4ff" stroke-width="0.5" opacity="0.3"/>
+        <line x1="96" y1="82" x2="42" y2="48" stroke="#00d4ff" stroke-width="0.5" opacity="0.3"/>
+        <!-- Vertices -->
+        <circle cx="60" cy="14" r="3" fill="#00d4ff" filter="url(#glow)"/>
+        <circle cx="96" cy="82" r="2.5" fill="#0066ff" filter="url(#glow)"/>
+        <circle cx="24" cy="82" r="2.5" fill="#0066ff" filter="url(#glow)"/>
+        <circle cx="60" cy="106" r="3" fill="#7b2fff" filter="url(#glow)"/>
+        <circle cx="42" cy="48" r="1.8" fill="#00d4ff" opacity="0.7"/>
+        <circle cx="78" cy="48" r="1.8" fill="#00d4ff" opacity="0.7"/>
+        <circle cx="60" cy="82" r="2" fill="#5599ff" opacity="0.8"/>
+        <!-- Animated pulse vertex -->
+        <circle cx="60" cy="14" r="3" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0">
+          <animate attributeName="r" values="3;10;3" dur="2.5s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.8;0;0.8" dur="2.5s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+
+    <div class="hero-wordmark">MeshThrift</div>
+    <div class="hero-tagline">Geometry-Aware Edge Infrastructure</div>
+    <div class="hero-descriptor">
+      Progressive mesh streaming and GPU-centric delivery for the spatial web. Edge-native 3D asset acceleration built for WebGL/WebGPU rendering pipelines.
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value">&lt;2ms</div>
+        <div class="hero-stat-label">Edge Latency</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">240+</div>
+        <div class="hero-stat-label">PoP Nodes</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">98%</div>
+        <div class="hero-stat-label">LOD Accuracy</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">10B+</div>
+        <div class="hero-stat-label">Triangles / Sec</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     SECTION 2: LOGO SYSTEM
+════════════════════════════════ -->
+<section id="logo-system">
+  <div class="container">
+    <div class="section-tag">01 / Logo System</div>
+    <h2 class="section-title">Identity Variants</h2>
+    <p class="section-subtitle">The logo mark adapts across dark, translucent, and light surfaces while maintaining geometric fidelity and edge clarity.</p>
+  </div>
+
+  <div class="logo-grid" style="margin-top:48px">
+    <!-- Dark bg -->
+    <div class="logo-cell logo-cell-dark">
+      <div class="wordmark-lockup">
+        <div class="logo-mark-sm">
+          <svg width="36" height="36" viewBox="0 0 120 120" fill="none">
+            <defs>
+              <linearGradient id="lg-sm1" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#00d4ff"/>
+                <stop offset="100%" stop-color="#0066ff"/>
+              </linearGradient>
+            </defs>
+            <polygon points="60,14 96,82 24,82" fill="rgba(0,100,255,0.15)" stroke="url(#lg-sm1)" stroke-width="1.2"/>
+            <polygon points="60,14 96,82 60,106" fill="rgba(0,212,255,0.08)" stroke="url(#lg-sm1)" stroke-width="1.2"/>
+            <polygon points="60,14 24,82 60,106" fill="rgba(0,200,255,0.06)" stroke="url(#lg-sm1)" stroke-width="1.2"/>
+            <polygon points="24,82 96,82 60,106" fill="rgba(0,212,255,0.12)" stroke="url(#lg-sm1)" stroke-width="1.2"/>
+            <circle cx="60" cy="14" r="3.5" fill="#00d4ff"/>
+            <circle cx="96" cy="82" r="3" fill="#0066ff"/>
+            <circle cx="24" cy="82" r="3" fill="#0066ff"/>
+            <circle cx="60" cy="106" r="3.5" fill="#7b2fff"/>
+          </svg>
+        </div>
+        <div class="wordmark-text wm-large wm-light">MeshThrift</div>
+      </div>
+      <div class="logo-cell-label">Primary — Dark Surface</div>
+    </div>
+
+    <!-- Mid bg -->
+    <div class="logo-cell logo-cell-mid">
+      <div class="wordmark-lockup" style="flex-direction:column; gap:12px">
+        <svg width="48" height="48" viewBox="0 0 120 120" fill="none">
+          <defs>
+            <linearGradient id="lg-v1" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#00d4ff"/>
+              <stop offset="100%" stop-color="#7b2fff"/>
+            </linearGradient>
+          </defs>
+          <polygon points="60,14 96,82 24,82" fill="rgba(0,100,255,0.2)" stroke="url(#lg-v1)" stroke-width="1.2"/>
+          <polygon points="60,14 96,82 60,106" fill="rgba(0,212,255,0.1)" stroke="url(#lg-v1)" stroke-width="1.2"/>
+          <polygon points="60,14 24,82 60,106" fill="rgba(0,200,255,0.08)" stroke="url(#lg-v1)" stroke-width="1.2"/>
+          <polygon points="24,82 96,82 60,106" fill="rgba(0,212,255,0.18)" stroke="url(#lg-v1)" stroke-width="1.2"/>
+          <circle cx="60" cy="14" r="4" fill="#00d4ff"/>
+          <circle cx="96" cy="82" r="3.5" fill="#0066ff"/>
+          <circle cx="24" cy="82" r="3.5" fill="#0066ff"/>
+          <circle cx="60" cy="106" r="4" fill="#7b2fff"/>
+        </svg>
+        <div class="wordmark-text wm-medium" style="background:linear-gradient(90deg,#fff,#aaddff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">MeshThrift</div>
+      </div>
+      <div class="logo-cell-label">Stacked Variant</div>
+    </div>
+
+    <!-- Light bg -->
+    <div class="logo-cell logo-cell-light">
+      <div class="wordmark-lockup">
+        <div class="logo-mark-sm">
+          <svg width="36" height="36" viewBox="0 0 120 120" fill="none">
+            <polygon points="60,14 96,82 24,82" fill="rgba(0,100,200,0.12)" stroke="#0055cc" stroke-width="1.5"/>
+            <polygon points="60,14 96,82 60,106" fill="rgba(0,100,200,0.06)" stroke="#0055cc" stroke-width="1.5"/>
+            <polygon points="60,14 24,82 60,106" fill="rgba(0,100,200,0.04)" stroke="#0055cc" stroke-width="1.5"/>
+            <polygon points="24,82 96,82 60,106" fill="rgba(0,100,200,0.1)" stroke="#0055cc" stroke-width="1.5"/>
+            <circle cx="60" cy="14" r="3.5" fill="#0044bb"/>
+            <circle cx="96" cy="82" r="3" fill="#0055cc"/>
+            <circle cx="24" cy="82" r="3" fill="#0055cc"/>
+            <circle cx="60" cy="106" r="3.5" fill="#5500cc"/>
+          </svg>
+        </div>
+        <div class="wordmark-text wm-large wm-dark">MeshThrift</div>
+      </div>
+      <div class="logo-cell-label" style="color:#888">Light Surface</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     SECTION 3: COLOR SYSTEM
+════════════════════════════════ -->
+<section id="color-system">
+  <div class="container">
+    <div class="section-tag">02 / Color System</div>
+    <h2 class="section-title">Spatial Palette</h2>
+    <p class="section-subtitle">A deep-space chromatic system engineered for GPU-rendered interfaces, spatial displays, and infrastructure dashboards.</p>
+
+    <div class="color-grid">
+      <div class="color-chip">
+        <div class="color-swatch sw-navy">
+          <div class="color-swatch-inner"><span class="color-hex">#020C1B</span></div>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Deep Space</div>
+          <div class="color-role">Primary Background</div>
+        </div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch sw-deepblue">
+          <div class="color-swatch-inner"><span class="color-hex">#030F21</span></div>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Void Navy</div>
+          <div class="color-role">Surface / Layer</div>
+        </div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch sw-electricblue">
+          <div class="color-swatch-inner"><span class="color-hex">#0066FF</span></div>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Electric Blue</div>
+          <div class="color-role">Primary Action</div>
+        </div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch sw-cyan">
+          <div class="color-swatch-inner"><span class="color-hex">#00D4FF</span></div>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Cyan Pulse</div>
+          <div class="color-role">Highlight / Edge</div>
+        </div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch sw-purple">
+          <div class="color-swatch-inner"><span class="color-hex">#7B2FFF</span></div>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Vertex Purple</div>
+          <div class="color-role">Accent / Depth</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secondary chips -->
+    <div class="color-grid-2">
+      <div class="color-chip">
+        <div class="color-swatch" style="background:#0a1f3a; height:72px">
+          <div class="color-swatch-inner"><span class="color-hex">#0A1F3A</span></div>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Mesh Navy</div>
+          <div class="color-role">Card Surface</div>
+        </div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch" style="background:linear-gradient(135deg,#003388,#1a7fff); height:72px">
+          <div class="color-swatch-inner"><span class="color-hex">#1A7FFF</span></div>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Sky Blue</div>
+          <div class="color-role">Interactive</div>
+        </div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch" style="background:#f0f8ff; height:72px">
+          <div class="color-swatch-inner"><span class="color-hex" style="color:rgba(0,0,0,0.3)">#F0F8FF</span></div>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Render White</div>
+          <div class="color-role">Text / Labels</div>
+        </div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch" style="background:linear-gradient(135deg,#00ff88,#00ccaa); height:72px">
+          <div class="color-swatch-inner"><span class="color-hex">#00FF88</span></div>
+        </div>
+        <div class="color-info">
+          <div class="color-name">Status Green</div>
+          <div class="color-role">Active / Live</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tonal scales -->
+    <div class="tonal-section">
+      <div class="tonal-label">Cyan Scale</div>
+      <div class="tonal-strip">
+        <div class="tonal-step" style="background:rgba(0,212,255,0.04)"></div>
+        <div class="tonal-step" style="background:rgba(0,212,255,0.08)"></div>
+        <div class="tonal-step" style="background:rgba(0,212,255,0.15)"></div>
+        <div class="tonal-step" style="background:rgba(0,212,255,0.25)"></div>
+        <div class="tonal-step" style="background:rgba(0,212,255,0.4)"></div>
+        <div class="tonal-step" style="background:rgba(0,212,255,0.6)"></div>
+        <div class="tonal-step" style="background:rgba(0,212,255,0.8)"></div>
+        <div class="tonal-step" style="background:#00d4ff"></div>
+        <div class="tonal-step" style="background:#33ddff"></div>
+        <div class="tonal-step" style="background:#66e8ff"></div>
+      </div>
+
+      <div class="tonal-label" style="margin-top:16px">Blue Scale</div>
+      <div class="tonal-strip">
+        <div class="tonal-step" style="background:rgba(0,102,255,0.04)"></div>
+        <div class="tonal-step" style="background:rgba(0,102,255,0.08)"></div>
+        <div class="tonal-step" style="background:rgba(0,102,255,0.15)"></div>
+        <div class="tonal-step" style="background:rgba(0,102,255,0.25)"></div>
+        <div class="tonal-step" style="background:rgba(0,102,255,0.4)"></div>
+        <div class="tonal-step" style="background:rgba(0,102,255,0.6)"></div>
+        <div class="tonal-step" style="background:rgba(0,102,255,0.8)"></div>
+        <div class="tonal-step" style="background:#0066ff"></div>
+        <div class="tonal-step" style="background:#3388ff"></div>
+        <div class="tonal-step" style="background:#66aaff"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     SECTION 4: TYPOGRAPHY
+════════════════════════════════ -->
+<section id="typography">
+  <div class="container">
+    <div class="section-tag">03 / Typography</div>
+    <h2 class="section-title">Type System</h2>
+    <p class="section-subtitle">Three typeface roles: geometric display for authority, humanist sans for readability, and monospace for technical precision.</p>
+  </div>
+
+  <div class="type-grid" style="margin-top:48px">
+    <div class="type-block">
+      <div class="type-meta">
+        <span>SYNE — Display</span>
+        <span>Weight 800</span>
+        <span>−0.04em tracking</span>
+      </div>
+      <div class="type-sample-display">Spatial<br>Mesh<br>Edge</div>
+      <div class="type-sample-condensed">SYNE</div>
+    </div>
+
+    <div class="type-block">
+      <div class="type-meta">
+        <span>BARLOW — Body</span>
+        <span>Weight 300–600</span>
+        <span>+0.01em tracking</span>
+      </div>
+      <div class="type-sample-body">
+        Progressive mesh delivery at the edge of spatial computing. Infrastructure that speaks the language of geometry.
+      </div>
+    </div>
+
+    <div class="type-block" style="grid-column:1/-1">
+      <div class="type-meta">
+        <span>JETBRAINS MONO — Technical</span>
+        <span>Weight 300–500</span>
+        <span>+0.02em tracking</span>
+      </div>
+      <div class="type-sample-mono">
+        mesh.stream({ lod: 'adaptive', budget: 12_000, edge: 'closest' })<br>
+        &gt; streaming 847 triangles/frame @ 2.3ms p95 latency<br>
+        &gt; vertex_cache_hit_rate: 0.94  |  draw_calls: 12  |  gpu_budget: 8.4ms
+      </div>
+    </div>
+  </div>
+
+  <!-- Type scale -->
+  <div class="container">
+    <div class="type-scale">
+      <div class="type-scale-row">
+        <div class="type-scale-size">96px / 800</div>
+        <div class="type-scale-sample" style="font-size:64px">Edge</div>
+        <div class="type-scale-role">Hero Display</div>
+      </div>
+      <div class="type-scale-row">
+        <div class="type-scale-size">56px / 800</div>
+        <div class="type-scale-sample" style="font-size:42px">MeshThrift</div>
+        <div class="type-scale-role">Section Heading</div>
+      </div>
+      <div class="type-scale-row">
+        <div class="type-scale-size">32px / 700</div>
+        <div class="type-scale-sample" style="font-size:28px">Spatial Infrastructure</div>
+        <div class="type-scale-role">Subsection</div>
+      </div>
+      <div class="type-scale-row">
+        <div class="type-scale-size">20px / 600</div>
+        <div class="type-scale-sample" style="font-size:18px">Progressive LOD Streaming</div>
+        <div class="type-scale-role">Card Title</div>
+      </div>
+      <div class="type-scale-row">
+        <div class="type-scale-size">14px / 400</div>
+        <div class="type-scale-sample" style="font-size:14px; font-weight:400; font-family:'Barlow',sans-serif; letter-spacing:0; color:rgba(240,248,255,0.6)">Geometry-aware edge delivery for real-time 3D rendering at scale.</div>
+        <div class="type-scale-role">Body Copy</div>
+      </div>
+      <div class="type-scale-row">
+        <div class="type-scale-size">10px / 400</div>
+        <div class="type-scale-sample" style="font-size:10px; font-weight:400; font-family:'JetBrains Mono',monospace; letter-spacing:0.2em; color:rgba(0,212,255,0.6); text-transform:uppercase">EDGE · NODE · STREAM · VERTEX</div>
+        <div class="type-scale-role">Mono Label</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     SECTION 5: PATTERN LIBRARY
+════════════════════════════════ -->
+<section id="patterns">
+  <div class="container">
+    <div class="section-tag">04 / Pattern Library</div>
+    <h2 class="section-title">Mesh Patterns</h2>
+    <p class="section-subtitle">Generative geometric patterns derived from mesh topology, vertex networks, and spatial grid systems.</p>
+  </div>
+
+  <div class="pattern-grid" style="margin-top:48px">
+    <div class="pattern-cell">
+      <canvas id="pattern-delaunay"></canvas>
+      <div class="pattern-label">Delaunay Mesh</div>
+    </div>
+    <div class="pattern-cell">
+      <canvas id="pattern-hex"></canvas>
+      <div class="pattern-label">Spatial Grid</div>
+    </div>
+    <div class="pattern-cell">
+      <canvas id="pattern-flow"></canvas>
+      <div class="pattern-label">Edge Flow</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     SECTION 6: UI COMPONENTS
+════════════════════════════════ -->
+<section id="components">
+  <div class="container">
+    <div class="section-tag">05 / UI Components</div>
+    <h2 class="section-title">Interface Language</h2>
+    <p class="section-subtitle">Angular precision, geometric clip-paths, and monospaced labels define the MeshThrift interaction layer.</p>
+  </div>
+
+  <div class="component-grid" style="margin-top:48px">
+    <!-- Buttons -->
+    <div class="component-panel">
+      <div class="component-panel-title">Buttons</div>
+      <div class="btn-row">
+        <button class="btn btn-primary">Deploy Edge</button>
+        <button class="btn btn-secondary">Configure</button>
+        <button class="btn btn-ghost">Cancel</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-danger">Flush Cache</button>
+        <button class="btn btn-primary" style="font-size:10px;padding:9px 20px">Stream Now ↗</button>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="component-panel">
+      <div class="component-panel-title">Status Badges</div>
+      <div class="badge-row">
+        <span class="badge badge-active">Live Streaming</span>
+        <span class="badge badge-streaming">GPU Active</span>
+      </div>
+      <div class="badge-row">
+        <span class="badge badge-pending">LOD Pending</span>
+        <span class="badge badge-error">Edge Timeout</span>
+        <span class="badge badge-neutral">Idle Node</span>
+      </div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="component-panel" style="grid-column:1/-1">
+      <div class="component-panel-title">Metric Cards</div>
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="metric-card-label">P95 Edge Latency</div>
+          <div class="metric-card-value">1.8ms</div>
+          <div class="metric-card-sub">Global average</div>
+          <div class="metric-card-delta">↓ 12%</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card-label">Triangles Streamed</div>
+          <div class="metric-card-value">12.4B</div>
+          <div class="metric-card-sub">Last 24h</div>
+          <div class="metric-card-delta">↑ 34%</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card-label">LOD Cache Hit</div>
+          <div class="metric-card-value">97.2%</div>
+          <div class="metric-card-sub">Across all PoPs</div>
+          <div class="metric-card-delta">↑ 2.1%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="component-panel">
+      <div class="component-panel-title">Inputs</div>
+      <input class="input-field" placeholder="mesh-asset-id or URL" type="text"/>
+      <div class="input-group">
+        <input class="input-field" placeholder="edge-region" type="text" style="width:140px;flex:0 0 140px"/>
+        <button class="btn btn-primary" style="flex:1">Analyze</button>
+      </div>
+    </div>
+
+    <!-- Dashboard mini -->
+    <div class="component-panel">
+      <div class="component-panel-title">Node Status</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--navy-4);border:1px solid rgba(0,212,255,0.12)">
+          <div>
+            <div style="font-family:'Barlow',sans-serif;font-size:12px;font-weight:600;color:var(--white)">us-east-gpu-01</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px">WebGPU · 4× A100</div>
+          </div>
+          <span class="badge badge-active" style="margin:0">Active</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--navy-4);border:1px solid rgba(0,212,255,0.12)">
+          <div>
+            <div style="font-family:'Barlow',sans-serif;font-size:12px;font-weight:600;color:var(--white)">eu-west-mesh-04</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px">WebGL3 · 2× H100</div>
+          </div>
+          <span class="badge badge-streaming" style="margin:0">Streaming</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--navy-4);border:1px solid rgba(0,212,255,0.12)">
+          <div>
+            <div style="font-family:'Barlow',sans-serif;font-size:12px;font-weight:600;color:var(--white)">ap-se-edge-11</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px">WGPU · 8× RTX 4090</div>
+          </div>
+          <span class="badge badge-pending" style="margin:0">LOD Sync</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     SECTION 7: ICON LANGUAGE
+════════════════════════════════ -->
+<section id="icons">
+  <div class="container">
+    <div class="section-tag">06 / Icon Language</div>
+    <h2 class="section-title">Geometric Icons</h2>
+    <p class="section-subtitle">Thin-stroke iconography built from mesh primitives — vertices, edges, triangles, and spatial topology.</p>
+  </div>
+
+  <div class="icon-grid" style="margin-top:48px">
+    <div class="icon-cell">
+      <svg viewBox="0 0 32 32"><polygon points="16,2 30,28 2,28" /><line x1="16" y1="2" x2="16" y2="28"/><line x1="2" y1="28" x2="23" y2="15"/><circle cx="16" cy="2" r="2" fill="#00d4ff" stroke="none"/><circle cx="30" cy="28" r="2" fill="#00d4ff" stroke="none"/><circle cx="2" cy="28" r="2" fill="#00d4ff" stroke="none"/></svg>
+      <div class="icon-cell-name">Mesh Node</div>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 32 32"><rect x="3" y="3" width="11" height="11" rx="1"/><rect x="18" y="3" width="11" height="11" rx="1"/><rect x="3" y="18" width="11" height="11" rx="1"/><rect x="18" y="18" width="11" height="11" rx="1"/><line x1="14" y1="8.5" x2="18" y2="8.5"/><line x1="14" y1="23.5" x2="18" y2="23.5"/><line x1="8.5" y1="14" x2="8.5" y2="18"/><line x1="23.5" y1="14" x2="23.5" y2="18"/></svg>
+      <div class="icon-cell-name">Edge Grid</div>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 32 32"><polyline points="2,16 10,8 22,20 30,12" fill="none" stroke-linejoin="round"/><circle cx="2" cy="16" r="2.5" fill="#00d4ff" stroke="none"/><circle cx="10" cy="8" r="2.5" fill="#00d4ff" stroke="none"/><circle cx="22" cy="20" r="2.5" fill="#00d4ff" stroke="none"/><circle cx="30" cy="12" r="2.5" fill="#00d4ff" stroke="none"/></svg>
+      <div class="icon-cell-name">LOD Stream</div>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13"/><line x1="16" y1="3" x2="16" y2="29"/><line x1="3" y1="16" x2="29" y2="16"/><ellipse cx="16" cy="16" rx="13" ry="6"/><ellipse cx="16" cy="16" rx="6" ry="13"/></svg>
+      <div class="icon-cell-name">Sphere Mesh</div>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 32 32"><path d="M16 3 L29 10 L29 22 L16 29 L3 22 L3 10 Z"/><line x1="16" y1="3" x2="16" y2="29"/><line x1="3" y1="10" x2="29" y2="22"/><line x1="3" y1="22" x2="29" y2="10"/></svg>
+      <div class="icon-cell-name">Hexahedron</div>
+    </div>
+    <div class="icon-cell">
+      <svg viewBox="0 0 32 32"><path d="M16 4 L28 12 L24 26 L8 26 L4 12 Z" fill="none"/><line x1="16" y1="4" x2="16" y2="26"/><line x1="16" y1="4" x2="4" y2="12"/><line x1="16" y1="4" x2="28" y2="12"/><circle cx="16" cy="4" r="2" fill="#00d4ff" stroke="none"/></svg>
+      <div class="icon-cell-name">Vertex Fan</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     SECTION 8: BRAND IN CONTEXT
+════════════════════════════════ -->
+<section id="context">
+  <div class="container">
+    <div class="section-tag">07 / Brand in Context</div>
+    <h2 class="section-title">Applied Identity</h2>
+    <p class="section-subtitle">How the MeshThrift identity performs across dashboard interfaces and developer-facing API surfaces.</p>
+  </div>
+
+  <div class="context-grid" style="margin-top:48px">
+    <!-- Dashboard mockup -->
+    <div class="dashboard-mockup">
+      <div class="dash-header">
+        <div class="dash-logo">Mesh<span>Thrift</span></div>
+        <div class="dash-nav">
+          <div class="dash-nav-item active">Overview</div>
+          <div class="dash-nav-item">Nodes</div>
+          <div class="dash-nav-item">Assets</div>
+          <div class="dash-nav-item">Analytics</div>
+        </div>
+      </div>
+      <div class="dash-body">
+        <div class="dash-metrics">
+          <div class="dash-metric"><div class="dash-metric-v">1.8ms</div><div class="dash-metric-l">P95 Latency</div></div>
+          <div class="dash-metric"><div class="dash-metric-v">12.4B</div><div class="dash-metric-l">Triangles</div></div>
+          <div class="dash-metric"><div class="dash-metric-v">240</div><div class="dash-metric-l">PoP Nodes</div></div>
+          <div class="dash-metric"><div class="dash-metric-v">99.97%</div><div class="dash-metric-l">Uptime</div></div>
+        </div>
+        <div class="dash-chart-area">
+          <canvas id="dash-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- API mockup -->
+    <div class="api-mockup">
+      <div class="api-header">
+        <span class="api-method">POST</span>
+        <span class="api-path">/v1/mesh/<span>stream</span></span>
+      </div>
+      <div class="api-body">
+        <pre class="api-code"><span class="api-comment">// Request</span>
+{
+  <span class="api-key">"asset_id"</span>: <span class="api-val-str">"mesh_7f2k9a"</span>,
+  <span class="api-key">"lod_strategy"</span>: <span class="api-val-str">"adaptive"</span>,
+  <span class="api-key">"triangle_budget"</span>: <span class="api-val-num">24000</span>,
+  <span class="api-key">"edge_region"</span>: <span class="api-val-str">"closest"</span>,
+  <span class="api-key">"gpu_priority"</span>: <span class="api-val-bool">true</span>
+}
+
+<span class="api-comment">// 200 OK</span>
+{
+  <span class="api-key">"stream_url"</span>: <span class="api-result">"wss://edge.meshthrift.io/..."</span>,
+  <span class="api-key">"lod_levels"</span>: <span class="api-val-num">6</span>,
+  <span class="api-key">"edge_node"</span>: <span class="api-val-str">"us-east-gpu-01"</span>,
+  <span class="api-key">"p95_latency"</span>: <span class="api-result">"1.8ms"</span>,
+  <span class="api-key">"triangles_ready"</span>: <span class="api-val-num">18420</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     SECTION 9: BRAND VOICE
+════════════════════════════════ -->
+<section id="voice">
+  <div class="container">
+    <div class="section-tag">08 / Brand Voice</div>
+    <h2 class="section-title">Voice & Tone</h2>
+    <p class="section-subtitle">MeshThrift communicates with technical authority, confident precision, and spatial intelligence.</p>
+  </div>
+
+  <div class="voice-grid" style="margin-top:48px">
+    <div class="voice-card voice-card-a">
+      <div class="voice-title">Precise</div>
+      <ul class="voice-list">
+        <li>Measurement over metaphor</li>
+        <li>Latency in milliseconds</li>
+        <li>Specificity earns trust</li>
+        <li>Technical depth is a feature</li>
+      </ul>
+      <div class="voice-example">
+        <div class="voice-example-label">Example</div>
+        <div class="voice-example-text">"P95 edge latency of 1.8ms across 240 PoP nodes. Not approximately. Not roughly."</div>
+      </div>
+    </div>
+
+    <div class="voice-card voice-card-b">
+      <div class="voice-title">Spatial</div>
+      <ul class="voice-list">
+        <li>Geometry is the vocabulary</li>
+        <li>Infrastructure has topology</li>
+        <li>Edges are vertices of thought</li>
+        <li>Spatial computing, spatial language</li>
+      </ul>
+      <div class="voice-example">
+        <div class="voice-example-label">Example</div>
+        <div class="voice-example-text">"Every triangle has a home. We find the nearest edge, stream the geometry, render the world."</div>
+      </div>
+    </div>
+
+    <div class="voice-card voice-card-c">
+      <div class="voice-title">Uncompromising</div>
+      <ul class="voice-list">
+        <li>No abstraction for abstraction's sake</li>
+        <li>Real numbers. Real architecture.</li>
+        <li>Built for engineers, not marketing</li>
+        <li>Performance is non-negotiable</li>
+      </ul>
+      <div class="voice-example">
+        <div class="voice-example-label">Example</div>
+        <div class="voice-example-text">"We do not approximate. We do not batch delay. We stream geometry at the speed of light."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════
+     FOOTER
+════════════════════════════════ -->
+<section id="footer-brand">
+  <canvas id="footer-canvas"></canvas>
+  <div class="container footer-inner">
+    <div class="footer-logo-large">MeshThrift</div>
+    <div class="tagline-list">
+      <div class="tagline-item">Geometry-Aware Edge Infrastructure</div>
+      <div class="tagline-item">Progressive Mesh Streaming · GPU-Centric Delivery · Spatial Computing</div>
+      <div class="tagline-item">Built for the Spatial Internet</div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-badge">WebGL / WebGPU Native</span>
+      <span class="footer-badge">Edge-First Architecture</span>
+      <span class="footer-badge">Adaptive LOD Streaming</span>
+    </div>
+    <div style="margin-top:48px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(240,248,255,0.15)">
+      MeshThrift Brand Identity System · v1.0 · Spatial Infrastructure
+    </div>
+  </div>
+</section>
+
+</div><!-- end page-wrap -->
 
 <script>
-const D={
-input_guard:{t:'app/security/input_guard.py',d:'First gate on every request. Validates and sanitizes user input. Blocks prompt injection patterns, enforces max token limits, detects jailbreak attempts via classifier + rule set. No request proceeds without passing this gate.',tags:[['Security guard','tc'],['Pre-LLM','ta'],['Every request','tg']]},
-query_rewriter:{t:'app/services/query_rewriter.py',d:'Rewrites ambiguous or underspecified queries using an LLM. Supports HyDE (Hypothetical Document Embedding) for better dense retrieval alignment, and standalone question reformulation to resolve conversational pronouns.',tags:[['LLM call','tb'],['HyDE','tt'],['services/','tg']]},
-semantic_cache:{t:'app/services/semantic_cache.py',d:'Embedding-based semantic cache. Computes cosine similarity of incoming query against cached embeddings in Redis. Cache hits short-circuit the entire pipeline. TTL and similarity threshold configurable via config.py.',tags:[['Redis','ta'],['Skip pipeline','tt'],['Configurable','tg']]},
-query_router:{t:'app/services/query_router.py',d:'Rule-based + LLM-assisted routing determines retrieval path: vector DB, web search, code search, or direct LLM answer. All routing thresholds and rules live in config.py — zero hardcoded values.',tags:[['Routing','tt'],['LLM-assisted','tb'],['Configurable','tg']]},
-hybrid_retriever:{t:'app/components/hybrid_retriever.py',d:'Hybrid search combining dense vector retrieval (pgvector or Pinecone) with sparse BM25 keyword retrieval. Results merged using Reciprocal Rank Fusion (RRF). Configurable top_k and alpha weight between dense/sparse legs.',tags:[['RRF fusion','tp'],['BM25 + Dense','tt'],['components/','tg']]},
-document_grader:{t:'app/agents/document_grader.py',d:'LLM-based grader scores each retrieved document against the query — returns relevant / not_relevant with confidence. Filters out irrelevant documents before generation, directly reducing hallucination risk.',tags:[['LLM call','tb'],['Self-correcting','tp'],['agents/','tg']]},
-reranker:{t:'app/components/reranker.py',d:'Cross-encoder reranking via ms-marco-MiniLM or Cohere Rerank API. Accepts query + graded candidates, returns scored and sorted list. Score thresholding prevents low-confidence docs from reaching the generator.',tags:[['Cross-encoder','tp'],['Threshold','ta'],['components/','tg']]},
-adaptive_router:{t:'app/agents/adaptive_router.py',d:'Self-reflection agent. If graded documents are insufficient, triggers fallback mid-pipeline: web search, query rewrite + retry, or direct LLM answer. The system diagnoses and heals poor retrieval quality before generation.',tags:[['Self-healing','tp'],['Fallback loop','tc'],['agents/','tg']]},
-rag_pipeline:{t:'app/services/rag_pipeline.py',d:'Top-level orchestrator: rewrite → route → retrieve → grade → rerank → generate. Returns a structured QueryResponse. Every stage emits an OpenTelemetry span. Fully async. Handles all fallback paths.',tags:[['Orchestrator','tb'],['OTel spans','tk'],['Async-first','tt']]},
-output_filter:{t:'app/security/output_filter.py',d:'Post-generation guard. Checks LLM response for hallucination signals, PII leakage, and policy violations. Can trigger regeneration or serve a safe fallback response. Runs on every outgoing response.',tags:[['Security guard','tc'],['Every response','tp'],['Regen trigger','ta']]},
-tracer:{t:'observability/tracer.py + cost_tracker.py',d:'OTel distributed tracing creates spans per stage with LLM attributes: model, tokens in/out, latency. Exports to Jaeger, Datadog, or Langfuse. cost_tracker.py logs token usage and estimated cost per request, per user, per stage.',tags:[['OTel','tk'],['Cost-aware','ta'],['Every LLM call','tg']]},
-content_filter:{t:'app/security/content_filter.py',d:'Filters retrieved documents before the LLM sees them. Strips PII and toxic content using regex rules + an LLM classifier. Prevents poisoned or policy-violating context from affecting generation.',tags:[['Security guard','tc'],['Pre-generation','ta'],['security/','tg']]},
-vector_search:{t:'app/agents/tools/vector_search.py',d:'Pluggable tool wrapper for vector DB retrieval. Returns List[Document] with metadata and similarity scores. Injectable interface — swap vector DB backends without changing any agent code.',tags:[['Pluggable','tp'],['Injectable','tt'],['tools/','tg']]},
-web_search:{t:'app/agents/tools/web_search.py',d:'Live web search wrapper (Tavily, Serper, or Brave Search API). Returns structured results: URL, title, snippet. Used by adaptive_router as fallback when vector retrieval quality is too low.',tags:[['Fallback','tc'],['Pluggable','tp'],['tools/','tg']]},
-code_search:{t:'app/agents/tools/code_search.py',d:'Code-specific search via GitHub API or local code index. Returns code snippets with file path and line references. Activated by query_router when query domain is detected as code.',tags:[['GitHub API','tb'],['Pluggable','tp'],['tools/','tg']]},
-evaluation:{t:'evaluation/',d:'offline_eval.py runs RAGAS metrics (faithfulness, answer relevancy, context precision/recall) against golden_dataset.json. online_monitor.py samples live traffic async and scores quality in the background. All results versioned by git SHA in eval_results/.',tags:[['RAGAS metrics','tt'],['Versioned','ta'],['CI-ready','tb']]},
-observability:{t:'observability/',d:'tracer.py (OTel spans per stage), feedback.py (thumbs up/down captured to Postgres/Redis), cost_tracker.py (per-request token + USD cost, daily/monthly aggregates, budget alerts). Every single LLM call logs tokens.',tags:[['OTel','tk'],['Feedback loop','tk'],['Cost tracking','ta']]},
-frontend:{t:'frontend/',d:'Streamlit or Gradio chat UI containerized separately. Displays source citations, feedback buttons, conversation history, and per-request cost. Communicates with app/ over the internal Docker network.',tags:[['Separate container','tg'],['Feedback','tk'],['Gradio/Streamlit','tb']]},
-conversation:{t:'app/services/conversation.py',d:'Per-session conversation history stored in Redis keyed by session_id. Implements sliding window or LLM-based summarization to stay within context window limits. Injects history into query_rewriter context.',tags:[['Redis','ta'],['Session-aware','tt'],['services/','tg']]},
-prompts:{t:'app/prompts/templates.py + registry.py',d:'All prompt templates as typed dataclasses with system, user, and context_injection fields. Central registry loads by name and version. Supports hot-swapping without restart via config file watch or remote config.',tags:[['Hot-swappable','tt'],['Versioned','ta'],['prompts/','tg']]},
-};
+/* ═══════════════════════════════════════════
+   GLOBAL MESH CANVAS (fixed background)
+═══════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('global-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], animId;
 
-function pick(key){
-  const d=D[key];if(!d)return;
-  document.getElementById('dt').textContent=d.t;
-  document.getElementById('dd').textContent=d.d;
-  document.getElementById('dtg').innerHTML=d.tags.map(([l,c])=>`<span class="tag ${c}">${l}</span>`).join('');
-}
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
 
-const C='#30363d';
-const T=(x,y,txt,bold,size,col)=>`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-size="${size||12}" font-weight="${bold?600:400}" fill="${col||'#e6edf3'}">${txt}</text>`;
-const R=(x,y,w,h,fill,stroke,key,label,sub)=>`<g class="ng" onclick="pick('${key}')"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${fill}" stroke="${stroke}" stroke-width="0.8"/>${T(x+w/2,y+(sub?h*0.38:h/2),label,true,12,stroke)}${sub?T(x+w/2,y+h*0.68,sub,false,10,stroke):''}</g>`;
-const L=(x1,y1,x2,y2,col,dash)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col||C}" stroke-width="0.8" ${dash?'stroke-dasharray="4 3"':''} marker-end="url(#a)"/>`;
-const DEFS=`<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>`;
+  function initParticles() {
+    particles = [];
+    const N = Math.floor(W * H / 28000);
+    for (let i = 0; i < N; i++) {
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: (Math.random() - 0.5) * 0.15,
+        r: Math.random() * 1.5 + 0.5
+      });
+    }
+  }
 
-const V={
-flow:`<svg width="100%" viewBox="0 0 680 620" role="img">
-${DEFS}
-<rect x="264" y="8" width="152" height="34" rx="8" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
-${T(340,25,'User query',true,12,'#8b949e')}
-${L(340,42,340,60)}
-${R(210,62,260,46,'#3d1210','#ff7b72','input_guard','input_guard.py','injection · jailbreak · tokens')}
-${L(340,108,340,126)}
-${R(210,128,260,46,'#0d2a45','#58a6ff','query_rewriter','query_rewriter.py','HyDE · standalone reformulation')}
-${L(340,174,340,192)}
-${R(210,194,260,46,'#3d2c0a','#e3b341','semantic_cache','semantic_cache.py','Redis · cosine sim · TTL')}
-<path d="M470 217 L550 217 L550 568 L470 568" fill="none" stroke="#e3b341" stroke-width="0.7" stroke-dasharray="4 3" marker-end="url(#a)" opacity="0.5"/>
-<text x="558" y="395" font-size="10" fill="#e3b341" font-family="-apple-system,sans-serif">cache hit</text>
-${L(340,240,340,258)}
-${R(210,260,260,46,'#0d3320','#39d353','query_router','query_router.py','vector · web · code · direct')}
-${L(340,306,340,324)}
-${R(190,326,300,46,'#2d2166','#a371f7','hybrid_retriever','hybrid_retriever.py','Dense + BM25 · RRF fusion')}
-${L(340,372,340,390)}
-${R(72,392,200,46,'#2d2166','#a371f7','document_grader','document_grader.py','relevant / not_relevant')}
-${R(408,392,200,46,'#2d2166','#a371f7','reranker','reranker.py','cross-encoder · threshold')}
-<line x1="272" y1="415" x2="408" y2="415" stroke="${C}" stroke-width="0.7" stroke-dasharray="3 2" marker-end="url(#a)"/>
-${R(72,456,200,38,'#3d1630','#f778ba','adaptive_router','adaptive_router.py','self-reflection · fallback')}
-<path d="M172 456 L172 438 L272 438" fill="none" stroke="#f778ba" stroke-width="0.7" stroke-dasharray="3 2" marker-end="url(#a)" opacity="0.6"/>
-<line x1="508" y1="438" x2="508" y2="526" stroke="${C}" stroke-width="0.7"/>
-<line x1="508" y1="526" x2="414" y2="526" stroke="${C}" stroke-width="0.8" marker-end="url(#a)"/>
-${R(224,510,180,38,'#0d3320','#39d353','rag_pipeline','rag_pipeline.py','')}
-${L(314,548,314,566)}
-${R(224,568,180,34,'#3d1210','#ff7b72','output_filter','output_filter.py','')}
-<rect x="12" y="126" width="56" height="396" rx="8" fill="#161b22" stroke="#30363d" stroke-width="0.5" stroke-dasharray="3 2"/>
-<g class="ng" onclick="pick('tracer')">
-<text x="40" y="324" text-anchor="middle" dominant-baseline="central" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif" transform="rotate(-90,40,324)">tracer.py · cost_tracker · OTel spans</text>
-</g>
-</svg>`,
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const maxD = 200;
 
-modules:`<svg width="100%" viewBox="0 0 680 500" role="img">
-${DEFS}
-<rect x="12" y="12" width="330" height="218" rx="12" fill="#161b22" stroke="${C}" stroke-width="0.5"/>
-<text x="24" y="28" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">app/ — services + components</text>
-${R(24,36,150,30,'#0d3320','#39d353','rag_pipeline','rag_pipeline.py','')}
-${R(184,36,148,30,'#0d2a45','#58a6ff','conversation','conversation.py','')}
-${R(24,76,150,30,'#0d2a45','#58a6ff','query_rewriter','query_rewriter.py','')}
-${R(184,76,148,30,'#0d3320','#39d353','query_router','query_router.py','')}
-${R(24,116,150,30,'#3d2c0a','#e3b341','semantic_cache','semantic_cache.py','')}
-${R(184,116,148,30,'#2d2166','#a371f7','hybrid_retriever','hybrid_retriever.py','')}
-${R(24,156,150,30,'#2d2166','#a371f7','reranker','reranker.py','')}
-${R(184,156,148,30,'#3d1030','#f778ba','prompts','prompts/ registry','')}
-<rect x="338" y="12" width="330" height="218" rx="12" fill="#161b22" stroke="${C}" stroke-width="0.5"/>
-<text x="350" y="28" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">app/agents/ — intelligence + tools</text>
-${R(350,36,150,30,'#2d2166','#a371f7','document_grader','document_grader.py','')}
-${R(510,36,148,30,'#3d1630','#f778ba','adaptive_router','adaptive_router.py','')}
-${R(350,76,90,30,'#21262d','#8b949e','vector_search','vector_search','')}
-${R(450,76,90,30,'#21262d','#8b949e','web_search','web_search','')}
-${R(550,76,118,30,'#21262d','#8b949e','code_search','code_search','')}
-<text x="350" y="124" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">tools/ — pluggable · injectable · mockable</text>
-<rect x="12" y="242" width="330" height="102" rx="12" fill="#161b22" stroke="#ff7b72" stroke-width="0.5" stroke-dasharray="4 2"/>
-<text x="24" y="258" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">app/security/ — three guard layers</text>
-${R(24,266,94,64,'#3d1210','#ff7b72','input_guard','input_guard','pre-LLM')}
-${R(128,266,94,64,'#3d1210','#ff7b72','content_filter','content_filter','docs filter')}
-${R(232,266,100,64,'#3d1210','#ff7b72','output_filter','output_filter','post-gen')}
-<rect x="338" y="242" width="330" height="102" rx="12" fill="#161b22" stroke="${C}" stroke-width="0.5"/>
-<text x="350" y="258" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">observability/ + evaluation/</text>
-${R(350,266,94,64,'#3d1630','#f778ba','tracer','tracer.py','OTel spans')}
-${R(454,266,100,64,'#3d1630','#f778ba','observability','cost+feedback','every LLM call')}
-${R(564,266,94,64,'#0d3320','#39d353','evaluation','evaluation/','RAGAS · CI')}
-<rect x="12" y="356" width="656" height="60" rx="10" fill="#161b22" stroke="${C}" stroke-width="0.5"/>
-<text x="24" y="372" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">infrastructure + dx</text>
-${R(24,378,106,28,'#0d2a45','#58a6ff','frontend','frontend/','')}
-<rect x="140" y="378" width="106" height="28" rx="6" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
-<text x="193" y="392" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#8b949e" font-family="-apple-system,sans-serif">docker-compose</text>
-<rect x="256" y="378" width="96" height="28" rx="6" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
-<text x="304" y="392" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#8b949e" font-family="-apple-system,sans-serif">pyproject.toml</text>
-<rect x="362" y="378" width="86" height="28" rx="6" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
-<text x="405" y="392" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#8b949e" font-family="-apple-system,sans-serif">tests/ pytest</text>
-<rect x="458" y="378" width="76" height="28" rx="6" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
-<text x="496" y="392" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#8b949e" font-family="-apple-system,sans-serif">scripts/</text>
-<rect x="544" y="378" width="116" height="28" rx="6" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
-<text x="602" y="392" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#8b949e" font-family="-apple-system,sans-serif">.claude/ AGENTS.md</text>
-<text x="340" y="456" text-anchor="middle" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">Color: purple = retrieval/agents · green = pipeline/services · red = security · pink = observability · blue = external/config</text>
-</svg>`,
+    for (let p of particles) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+    }
 
-security:`<svg width="100%" viewBox="0 0 680 420" role="img">
-${DEFS}
-<line x1="340" y1="16" x2="340" y2="402" stroke="#30363d" stroke-width="0.8" stroke-dasharray="3 3"/>
-<rect x="264" y="4" width="152" height="30" rx="8" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
-${T(340,19,'Incoming query',false,11,'#8b949e')}
-${L(340,34,340,54,'#30363d')}
-<g class="ng" onclick="pick('input_guard')">
-<rect x="170" y="56" width="340" height="78" rx="10" fill="#3d1210" stroke="#ff7b72" stroke-width="0.8"/>
-${T(340,82,'Layer 1 · input_guard.py',true,13,'#ff7b72')}
-${T(340,102,'Prompt injection · jailbreaks · max tokens · sanitize',false,11,'#ff7b72')}
-${T(340,118,'Rejects unconditionally — nothing passes without approval',false,10,'#8b949e')}
-</g>
-<text x="80" y="82" text-anchor="middle" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">injection</text>
-<line x1="168" y1="80" x2="104" y2="80" stroke="#ff7b72" stroke-width="0.7" marker-end="url(#a)" opacity="0.6"/>
-<text x="80" y="100" text-anchor="middle" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">jailbreak</text>
-<line x1="168" y1="98" x2="104" y2="98" stroke="#ff7b72" stroke-width="0.7" marker-end="url(#a)" opacity="0.6"/>
-${L(340,134,340,158,'#30363d')}
-<text x="350" y="150" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">retrieve docs</text>
-<g class="ng" onclick="pick('content_filter')">
-<rect x="170" y="160" width="340" height="78" rx="10" fill="#3d1210" stroke="#ff7b72" stroke-width="0.8"/>
-${T(340,186,'Layer 2 · content_filter.py',true,13,'#ff7b72')}
-${T(340,206,'PII strip · toxic content · policy violations in docs',false,11,'#ff7b72')}
-${T(340,222,'Runs on retrieved context before LLM sees it',false,10,'#8b949e')}
-</g>
-<text x="600" y="186" text-anchor="middle" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">PII in docs</text>
-<line x1="512" y1="184" x2="570" y2="184" stroke="#ff7b72" stroke-width="0.7" marker-end="url(#a)" opacity="0.6"/>
-<text x="600" y="206" text-anchor="middle" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">toxic text</text>
-<line x1="512" y1="204" x2="570" y2="204" stroke="#ff7b72" stroke-width="0.7" marker-end="url(#a)" opacity="0.6"/>
-${L(340,238,340,262,'#30363d')}
-<text x="350" y="254" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">LLM generate</text>
-<g class="ng" onclick="pick('output_filter')">
-<rect x="170" y="264" width="340" height="78" rx="10" fill="#3d1210" stroke="#ff7b72" stroke-width="0.8"/>
-${T(340,290,'Layer 3 · output_filter.py',true,13,'#ff7b72')}
-${T(340,310,'Hallucination signals · PII leakage · policy check',false,11,'#ff7b72')}
-${T(340,326,'Can force regeneration or serve safe fallback',false,10,'#8b949e')}
-</g>
-<text x="80" y="290" text-anchor="middle" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">hallucination</text>
-<line x1="168" y1="288" x2="104" y2="288" stroke="#ff7b72" stroke-width="0.7" marker-end="url(#a)" opacity="0.6"/>
-<text x="80" y="310" text-anchor="middle" font-size="10" fill="#ff7b72" font-family="-apple-system,sans-serif">PII leak</text>
-<line x1="168" y1="308" x2="104" y2="308" stroke="#ff7b72" stroke-width="0.7" marker-end="url(#a)" opacity="0.6"/>
-${L(340,342,340,368,'#30363d')}
-<rect x="264" y="370" width="152" height="30" rx="8" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
-${T(340,385,'Response delivered',true,12,'#39d353')}
-</svg>`,
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < maxD) {
+          const alpha = (1 - d/maxD) * 0.12;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(0,180,255,${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
 
-infra:`<svg width="100%" viewBox="0 0 680 410" role="img">
-${DEFS}
-<rect x="12" y="56" width="656" height="302" rx="14" fill="#161b22" stroke="${C}" stroke-width="0.5" stroke-dasharray="6 3"/>
-<text x="24" y="72" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">docker-compose · internal network · healthcheck on all deps</text>
-<g class="ng" onclick="pick('rag_pipeline')">
-<rect x="28" y="80" width="160" height="96" rx="10" fill="#0d3320" stroke="#39d353" stroke-width="0.8"/>
-${T(108,108,'app/',true,14,'#39d353')}
-${T(108,128,'FastAPI · :8000',false,10,'#39d353')}
-${T(108,144,'multi-stage Dockerfile',false,10,'#39d353')}
-${T(108,162,'non-root user',false,10,'#39d353')}
-</g>
-<g class="ng" onclick="pick('frontend')">
-<rect x="28" y="198" width="160" height="74" rx="10" fill="#0d2a45" stroke="#58a6ff" stroke-width="0.8"/>
-${T(108,224,'frontend/',true,14,'#58a6ff')}
-${T(108,244,'Gradio · :7860',false,10,'#58a6ff')}
-${T(108,260,'→ app:8000',false,10,'#58a6ff')}
-</g>
-<g class="ng" onclick="pick('semantic_cache')">
-<rect x="258" y="80" width="136" height="82" rx="10" fill="#3d2c0a" stroke="#e3b341" stroke-width="0.8"/>
-${T(326,112,'redis',true,14,'#e3b341')}
-${T(326,132,'Semantic cache',false,10,'#e3b341')}
-${T(326,148,'Session history',false,10,'#e3b341')}
-</g>
-<g class="ng" onclick="pick('observability')">
-<rect x="258" y="196" width="136" height="82" rx="10" fill="#2d2166" stroke="#a371f7" stroke-width="0.8"/>
-${T(326,228,'postgres',true,14,'#a371f7')}
-${T(326,248,'Feedback store',false,10,'#a371f7')}
-${T(326,264,'Alembic migrations',false,10,'#a371f7')}
-</g>
-<g class="ng" onclick="pick('hybrid_retriever')">
-<rect x="464" y="80" width="186" height="82" rx="10" fill="#2d2166" stroke="#a371f7" stroke-width="0.8"/>
-${T(557,110,'vector-db (Qdrant)',true,13,'#a371f7')}
-${T(557,130,'Dense vector index',false,10,'#a371f7')}
-${T(557,148,'pgvector / Pinecone',false,10,'#a371f7')}
-</g>
-<rect x="464" y="196" width="186" height="82" rx="10" fill="#21262d" stroke="${C}" stroke-width="0.5" stroke-dasharray="3 2"/>
-${T(557,226,'LLM API (external)',true,13,'#8b949e')}
-${T(557,246,'OpenAI / Anthropic',false,10,'#6e7681')}
-${T(557,264,'keys via config.py only',false,10,'#6e7681')}
-<line x1="188" y1="120" x2="256" y2="120" stroke="${C}" stroke-width="0.8" marker-end="url(#a)"/>
-<line x1="188" y1="152" x2="256" y2="237" stroke="${C}" stroke-width="0.8" marker-end="url(#a)"/>
-<line x1="394" y1="120" x2="462" y2="120" stroke="${C}" stroke-width="0.8" marker-end="url(#a)"/>
-<line x1="394" y1="152" x2="462" y2="237" stroke="${C}" stroke-width="0.8" marker-end="url(#a)"/>
-<rect x="246" y="6" width="188" height="32" rx="8" fill="#21262d" stroke="${C}" stroke-width="0.5"/>
-${T(340,22,'User (browser / API client)',false,11,'#8b949e')}
-<line x1="290" y1="38" x2="108" y2="54" stroke="${C}" stroke-width="0.8" marker-end="url(#a)" opacity="0.5"/>
-<text x="196" y="48" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif" transform="rotate(-7,196,48)">:7860 or :8000</text>
-<text x="340" y="375" text-anchor="middle" font-size="10" fill="#6e7681" font-family="-apple-system,sans-serif">scripts/healthcheck.py verifies all external deps at startup: vector DB · Redis · LLM API · web search API</text>
-</svg>`,
+          // Triangle fill between 3 connected nodes
+          for (let k = j + 1; k < particles.length; k++) {
+            const dx2 = particles[i].x - particles[k].x;
+            const dy2 = particles[i].y - particles[k].y;
+            const d2 = Math.sqrt(dx2*dx2 + dy2*dy2);
+            if (d2 < maxD * 0.7) {
+              const alpha3 = (1 - d/maxD) * (1 - d2/maxD) * 0.025;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.lineTo(particles[k].x, particles[k].y);
+              ctx.closePath();
+              ctx.fillStyle = `rgba(0,100,255,${alpha3})`;
+              ctx.fill();
+            }
+          }
+        }
+      }
+    }
 
-constraints:`<div style="padding:4px 0">
-<div class="constraint-grid">
-<div class="c-card"><div class="icon">⚡</div><h4>Async-first</h4><p>All I/O-bound operations use async/await — LLM calls, DB queries, cache reads, web search. No blocking calls allowed.</p></div>
-<div class="c-card"><div class="icon">🔒</div><h4>Type-safe</h4><p>Full type annotations on all functions. mypy runs in strict mode as part of CI. Pydantic for all request/response I/O.</p></div>
-<div class="c-card"><div class="icon">📡</div><h4>Observable</h4><p>Every pipeline stage emits an OpenTelemetry span with LLM-specific attributes: model, tokens in/out, latency, stage name.</p></div>
-<div class="c-card"><div class="icon">🔧</div><h4>Configurable</h4><p>Zero hardcoded model names, thresholds, or API URLs. Everything flows through config.py loaded from environment variables.</p></div>
-<div class="c-card"><div class="icon">🧪</div><h4>Testable</h4><p>All external services (LLM, vector DB, Redis, web search) are injectable and mockable. 80% coverage threshold enforced.</p></div>
-<div class="c-card"><div class="icon">🛡️</div><h4>Secure</h4><p>input_guard.py and output_filter.py run on every request/response. No PII in logs. Three guard layers total.</p></div>
-<div class="c-card"><div class="icon">💰</div><h4>Cost-aware</h4><p>Every LLM call logs token counts to cost_tracker.py. Per-request, per-user, per-stage aggregates. Budget alerts configurable.</p></div>
-<div class="c-card"><div class="icon">🔄</div><h4>Self-healing</h4><p>adaptive_router.py detects poor retrieval quality mid-pipeline and triggers fallback paths before generation begins.</p></div>
-</div>
-</div>`
-};
+    for (let p of particles) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,212,255,0.25)';
+      ctx.fill();
+    }
 
-function showView(v,btn){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('cv').innerHTML=V[v];
-  document.getElementById('dt').textContent='Click any component';
-  document.getElementById('dd').textContent='Click any highlighted module to see its file path, responsibilities, and implementation details.';
-  document.getElementById('dtg').innerHTML='';
-}
-document.getElementById('cv').innerHTML=V.flow;
+    animId = requestAnimationFrame(draw);
+  }
+
+  resize();
+  initParticles();
+  draw();
+  window.addEventListener('resize', () => { resize(); initParticles(); });
+})();
+
+/* ═══════════════════════════════════════════
+   HERO CANVAS
+═══════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, nodes = [], pulses = [], t = 0;
+
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+    initNodes();
+  }
+
+  function initNodes() {
+    nodes = [];
+    const cols = 12, rows = 8;
+    const gx = W / cols, gy = H / rows;
+    for (let i = 0; i <= cols; i++) {
+      for (let j = 0; j <= rows; j++) {
+        nodes.push({
+          x: i * gx + (Math.random() - 0.5) * gx * 0.6,
+          y: j * gy + (Math.random() - 0.5) * gy * 0.6,
+          ox: i * gx, oy: j * gy,
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.002 + Math.random() * 0.003,
+          amp: 8 + Math.random() * 12
+        });
+      }
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    t += 0.008;
+
+    // Subtle radial glow center
+    const cx = W / 2, cy = H / 2;
+    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.6);
+    grd.addColorStop(0, 'rgba(0,102,255,0.04)');
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+
+    // Update node positions
+    for (let n of nodes) {
+      n.x = n.ox + Math.sin(t * n.speed * 100 + n.phase) * n.amp;
+      n.y = n.oy + Math.cos(t * n.speed * 80 + n.phase + 1) * n.amp * 0.7;
+    }
+
+    const maxD = 180;
+
+    // Draw edges + triangles
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < maxD) {
+          const a = (1 - d/maxD);
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.strokeStyle = `rgba(0,180,255,${a * 0.18})`;
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+
+          for (let k = j + 1; k < nodes.length; k++) {
+            const dx2 = nodes[j].x - nodes[k].x;
+            const dy2 = nodes[j].y - nodes[k].y;
+            const d2 = Math.sqrt(dx2*dx2 + dy2*dy2);
+            const dx3 = nodes[i].x - nodes[k].x;
+            const dy3 = nodes[i].y - nodes[k].y;
+            const d3 = Math.sqrt(dx3*dx3 + dy3*dy3);
+            if (d2 < maxD && d3 < maxD) {
+              const ta = a * (1-d2/maxD) * (1-d3/maxD);
+              ctx.beginPath();
+              ctx.moveTo(nodes[i].x, nodes[i].y);
+              ctx.lineTo(nodes[j].x, nodes[j].y);
+              ctx.lineTo(nodes[k].x, nodes[k].y);
+              ctx.closePath();
+              ctx.fillStyle = `rgba(0,80,200,${ta * 0.06})`;
+              ctx.fill();
+            }
+          }
+        }
+      }
+    }
+
+    // Nodes
+    for (let n of nodes) {
+      const pulse = (Math.sin(t * 80 * n.speed + n.phase) + 1) * 0.5;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, 1 + pulse * 0.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0,212,255,${0.2 + pulse * 0.3})`;
+      ctx.fill();
+    }
+
+    // Travelling data pulses along edges
+    for (let p of pulses) {
+      p.t += 0.012;
+      if (p.t > 1) { p.t = 0; p.start = Math.floor(Math.random() * nodes.length); }
+      const closest = findClosest(nodes[p.start], nodes);
+      if (closest) {
+        const x = nodes[p.start].x + (closest.x - nodes[p.start].x) * p.t;
+        const y = nodes[p.start].y + (closest.y - nodes[p.start].y) * p.t;
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#00d4ff';
+        ctx.fill();
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  function findClosest(n, all) {
+    let best = null, bestD = Infinity;
+    for (let o of all) {
+      if (o === n) continue;
+      const dx = n.x - o.x, dy = n.y - o.y;
+      const d = dx*dx + dy*dy;
+      if (d < bestD && d < 180*180) { bestD = d; best = o; }
+    }
+    return best;
+  }
+
+  // Init some data pulses
+  for (let i = 0; i < 6; i++) {
+    pulses.push({ t: Math.random(), start: Math.floor(Math.random() * 80) });
+  }
+
+  resize();
+  draw();
+  window.addEventListener('resize', resize);
+})();
+
+/* ═══════════════════════════════════════════
+   PATTERN: DELAUNAY MESH
+═══════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('pattern-delaunay');
+  const ctx = canvas.getContext('2d');
+  let W, H, pts = [];
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width; H = canvas.height = rect.height;
+    pts = [];
+    for (let i = 0; i < 40; i++) {
+      pts.push({ x: Math.random() * W, y: Math.random() * H, vx:(Math.random()-.5)*0.4, vy:(Math.random()-.5)*0.4 });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    const maxD = 120;
+    for (let p of pts) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0||p.x > W) p.vx *= -1;
+      if (p.y < 0||p.y > H) p.vy *= -1;
+    }
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i+1; j < pts.length; j++) {
+        const dx = pts[i].x-pts[j].x, dy = pts[i].y-pts[j].y;
+        const d = Math.sqrt(dx*dx+dy*dy);
+        if (d < maxD) {
+          ctx.beginPath();
+          ctx.moveTo(pts[i].x,pts[i].y);
+          ctx.lineTo(pts[j].x,pts[j].y);
+          ctx.strokeStyle = `rgba(0,212,255,${(1-d/maxD)*0.5})`;
+          ctx.lineWidth = 0.7;
+          ctx.stroke();
+          for (let k = j+1; k < pts.length; k++) {
+            const dx2=pts[j].x-pts[k].x,dy2=pts[j].y-pts[k].y,d2=Math.sqrt(dx2*dx2+dy2*dy2);
+            const dx3=pts[i].x-pts[k].x,dy3=pts[i].y-pts[k].y,d3=Math.sqrt(dx3*dx3+dy3*dy3);
+            if (d2<maxD&&d3<maxD) {
+              ctx.beginPath();
+              ctx.moveTo(pts[i].x,pts[i].y);
+              ctx.lineTo(pts[j].x,pts[j].y);
+              ctx.lineTo(pts[k].x,pts[k].y);
+              ctx.closePath();
+              ctx.fillStyle = `rgba(0,80,200,${(1-d/maxD)*0.07})`;
+              ctx.fill();
+            }
+          }
+        }
+      }
+    }
+    for (let p of pts) {
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,1.5,0,Math.PI*2);
+      ctx.fillStyle='rgba(0,212,255,0.6)';
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  draw();
+  window.addEventListener('resize', resize);
+})();
+
+/* ═══════════════════════════════════════════
+   PATTERN: SPATIAL GRID
+═══════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('pattern-hex');
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0;
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width; H = canvas.height = rect.height;
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    t += 0.01;
+
+    const S = 36; // grid size
+    const cols = Math.ceil(W/S)+2, rows = Math.ceil(H/S)+2;
+
+    for (let r = -1; r < rows; r++) {
+      for (let c = -1; c < cols; c++) {
+        const x = c * S, y = r * S;
+        const wave = Math.sin(t + (c+r)*0.4) * 0.5 + 0.5;
+
+        // Grid lines
+        ctx.strokeStyle = `rgba(0,180,255,${0.04 + wave*0.1})`;
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(x,y,S,S);
+
+        // Diagonal
+        if ((c+r)%2===0) {
+          ctx.beginPath();
+          ctx.moveTo(x,y); ctx.lineTo(x+S,y+S);
+          ctx.strokeStyle = `rgba(0,100,255,${0.04 + wave*0.06})`;
+          ctx.stroke();
+        }
+
+        // Vertices
+        if (Math.random() < 0.002 || wave > 0.92) {
+          ctx.beginPath();
+          ctx.arc(x,y,wave*2,0,Math.PI*2);
+          ctx.fillStyle = `rgba(0,212,255,${wave*0.5})`;
+          ctx.fill();
+        }
+      }
+    }
+
+    // Scan line
+    const scanY = ((t * 30) % H);
+    ctx.beginPath();
+    ctx.moveTo(0, scanY); ctx.lineTo(W, scanY);
+    const scanGrd = ctx.createLinearGradient(0,scanY-1,0,scanY+1);
+    scanGrd.addColorStop(0,'transparent');
+    scanGrd.addColorStop(0.5,'rgba(0,212,255,0.25)');
+    scanGrd.addColorStop(1,'transparent');
+    ctx.strokeStyle = 'rgba(0,212,255,0.18)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  draw();
+  window.addEventListener('resize', resize);
+})();
+
+/* ═══════════════════════════════════════════
+   PATTERN: EDGE FLOW
+═══════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('pattern-flow');
+  const ctx = canvas.getContext('2d');
+  let W, H, streams = [];
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width; H = canvas.height = rect.height;
+    streams = [];
+    for (let i = 0; i < 12; i++) {
+      streams.push(makeStream());
+    }
+  }
+
+  function makeStream() {
+    const pts = [];
+    let x = Math.random() * W, y = -10;
+    const cx = W/2;
+    for (let i = 0; i < 8; i++) {
+      const angle = (Math.random() - 0.5) * 0.8;
+      x += Math.sin(angle) * 30;
+      y += 30 + Math.random() * 20;
+      pts.push({x,y});
+    }
+    return { pts, t: Math.random(), speed: 0.004 + Math.random() * 0.008, alpha: 0.3 + Math.random()*0.4, color: Math.random() > 0.6 ? '0,212,255' : '0,102,255' };
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+
+    for (let s of streams) {
+      s.t += s.speed;
+      if (s.t > 1) { Object.assign(s, makeStream(), {t:0}); }
+
+      // Draw path
+      ctx.beginPath();
+      ctx.moveTo(s.pts[0].x, s.pts[0].y);
+      for (let i = 1; i < s.pts.length; i++) {
+        const mx = (s.pts[i-1].x + s.pts[i].x)/2;
+        const my = (s.pts[i-1].y + s.pts[i].y)/2;
+        ctx.quadraticCurveTo(s.pts[i-1].x, s.pts[i-1].y, mx, my);
+      }
+      ctx.strokeStyle = `rgba(${s.color},${s.alpha * 0.15})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Travelling dot
+      const idx = Math.floor(s.t * (s.pts.length-1));
+      const local = (s.t * (s.pts.length-1)) - idx;
+      if (idx < s.pts.length - 1) {
+        const px = s.pts[idx].x + (s.pts[idx+1].x - s.pts[idx].x) * local;
+        const py = s.pts[idx].y + (s.pts[idx+1].y - s.pts[idx].y) * local;
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(${s.color},${s.alpha})`;
+        ctx.fill();
+
+        // Trail
+        ctx.beginPath();
+        ctx.arc(px, py, 5, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(${s.color},${s.alpha*0.2})`;
+        ctx.fill();
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  draw();
+  window.addEventListener('resize', resize);
+})();
+
+/* ═══════════════════════════════════════════
+   DASHBOARD CHART
+═══════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('dash-chart');
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0;
+  const data = Array.from({length: 60}, (_,i) => 40 + Math.sin(i*0.3)*20 + Math.random()*15);
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width; H = canvas.height = rect.height;
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    t += 0.02;
+    const D = data.length;
+
+    // Animated data
+    data.push(40 + Math.sin(t*2)*20 + Math.random()*15);
+    data.shift();
+
+    const min = Math.min(...data) - 5;
+    const max = Math.max(...data) + 5;
+    const range = max - min;
+
+    function toY(v) { return H - ((v-min)/range) * (H-10) - 5; }
+    function toX(i) { return (i / (D-1)) * W; }
+
+    // Area fill
+    const grd = ctx.createLinearGradient(0,0,0,H);
+    grd.addColorStop(0,'rgba(0,212,255,0.2)');
+    grd.addColorStop(1,'rgba(0,212,255,0)');
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    for (let i = 0; i < D; i++) ctx.lineTo(toX(i), toY(data[i]));
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fillStyle = grd;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    for (let i = 0; i < D; i++) {
+      i === 0 ? ctx.moveTo(toX(i), toY(data[i])) : ctx.lineTo(toX(i), toY(data[i]));
+    }
+    ctx.strokeStyle = 'rgba(0,212,255,0.8)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Grid lines
+    for (let g = 0; g < 4; g++) {
+      const y = (g/3) * H;
+      ctx.beginPath();
+      ctx.moveTo(0,y); ctx.lineTo(W,y);
+      ctx.strokeStyle = 'rgba(0,212,255,0.05)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  draw();
+  window.addEventListener('resize', resize);
+})();
+
+/* ═══════════════════════════════════════════
+   FOOTER CANVAS
+═══════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('footer-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, nodes = [], t = 0;
+
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+    nodes = [];
+    for (let i = 0; i < 50; i++) {
+      nodes.push({ x: Math.random()*W, y: Math.random()*H, vx:(Math.random()-.5)*0.2, vy:(Math.random()-.5)*0.2 });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    t += 0.005;
+    for (let n of nodes) {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x<0) n.x=W; if (n.x>W) n.x=0;
+      if (n.y<0) n.y=H; if (n.y>H) n.y=0;
+    }
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i+1; j < nodes.length; j++) {
+        const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if (d < 150) {
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x,nodes[i].y);
+          ctx.lineTo(nodes[j].x,nodes[j].y);
+          ctx.strokeStyle=`rgba(0,150,255,${(1-d/150)*0.2})`;
+          ctx.lineWidth=0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  draw();
+  window.addEventListener('resize', resize);
+})();
 </script>
 </body>
 </html>
